@@ -51,21 +51,32 @@ kubectl rollout status deployment/todo-app -n todo-app
 
 ---
 
-## 6-3. 오류 재현 실습 — 환경변수 누락
+## 6-3. 강사 데모 — 환경변수 누락 오류
+
+> 🎓 **이 섹션은 강사 데모로 진행합니다. 수강생은 직접 실행하지 않습니다.**
+> ConfigMap을 삭제했다가 복구가 불완전하면 3일차 실습에 영향을 미칠 수 있습니다.
+
+ConfigMap이 없으면 Pod 기동 시 어떤 오류가 발생하는지 강사가 직접 보여준다.
 
 ```powershell
-# ConfigMap 삭제 (환경변수 누락 시뮬레이션)
+# [강사만 실행] ConfigMap 삭제
 kubectl delete configmap app-config -n todo-app
 
-# Deployment 재시작
+# Deployment 재시작 후 오류 발생 확인
 kubectl rollout restart deployment/todo-app -n todo-app
 
-# Pod 상태/이벤트 확인 → ConfigMap not found 계열 오류 확인
+# Pod 상태 확인 → CreateContainerConfigError 또는 CrashLoopBackOff
 kubectl get pods -n todo-app
 kubectl describe pod -l app=todo-app -n todo-app
 ```
 
-**복구**
+**오류 메시지 예시**
+
+```
+configmaps "app-config" not found
+```
+
+**[강사만 실행] 복구**
 
 ```powershell
 kubectl apply -f k8s/app-configmap.yml -n todo-app

@@ -68,8 +68,9 @@
 4. Kubernetes에서 Deployment, Service, ConfigMap, Secret, PVC의 역할을 이해하고 적용할 수 있다.
 5. Kubernetes 배포 후 `kubectl get`, `describe`, `logs`, rollout 상태 확인으로 기본 진단을 수행할 수 있다.
 6. GitHub Actions로 애플리케이션 이미지를 빌드하고 GHCR에 push하는 CI 흐름을 이해할 수 있다.
-7. Argo CD를 이용해 Git 저장소의 매니페스트를 Kubernetes 클러스터에 동기화할 수 있다.
-8. 잘못된 이미지 태그 배포로 발생하는 장애를 확인하고 Git revert 또는 Argo CD 롤백으로 복구할 수 있다.
+7. Helm chart의 기본 구성과 values 기반 설정 변경 흐름을 이해할 수 있다.
+8. Argo CD를 이용해 Git 저장소의 매니페스트 또는 Helm chart를 Kubernetes 클러스터에 동기화할 수 있다.
+9. 잘못된 이미지 태그 배포로 발생하는 장애를 확인하고 Git revert 또는 Argo CD 롤백으로 복구할 수 있다.
 
 ---
 
@@ -139,11 +140,12 @@ k9s 또는 kubectl 명령으로 클러스터 상태를 확인할 수 있다.
   - API 응답, 로그, rollout 상태 확인
   - 기본 장애 진단 입문
 
-3일차: GitHub Actions + Argo CD GitOps
+3일차: GitHub Actions + Helm + Argo CD GitOps
   - 수강생 각자 fork 저장소 준비
   - GitHub Actions로 이미지 빌드 및 GHCR push
   - 수동으로 매니페스트 이미지 태그 변경
-  - Argo CD로 Git 상태를 클러스터에 Sync
+  - Helm chart/values/templates를 별도 학습 주제로 실습
+  - Argo CD로 Git 상태와 Helm chart를 클러스터에 Sync
   - 잘못된 이미지 태그 장애 재현 및 복구
 ```
 
@@ -229,7 +231,7 @@ Namespace 리소스 이름은 todo-app 사용
 
 ---
 
-## 8.3 3일차 — GitHub Actions + Argo CD GitOps
+## 8.3 3일차 — GitHub Actions + Helm + Argo CD GitOps
 
 ### 핵심 메시지
 
@@ -238,7 +240,7 @@ Namespace 리소스 이름은 todo-app 사용
 
 ### 3일차 Kubernetes 리소스 전제
 
-3일차 `day3/k8s`는 Argo CD가 동기화할 앱 Deployment와 kustomization만 포함한다. 다음 기반 리소스는 2일차 실습 결과를 그대로 사용한다.
+3일차는 `day3/k8s`의 앱 Deployment로 GitOps 흐름을 먼저 잡고, 이어서 Helm을 별도 학습 주제로 확장한다. Helm 파트에서는 같은 앱 Deployment를 chart/values/templates 구조로 재구성해 배포 소스를 패키징하는 방식을 다룬다. 다음 기반 리소스는 2일차 실습 결과를 그대로 사용한다.
 
 - `todo-app` Namespace
 - `todo-app` Service
@@ -253,14 +255,15 @@ Namespace 리소스 이름은 todo-app 사용
 - 수강생 각자 대표 저장소를 fork한다.
 - 각자 fork 저장소에서 GitHub Actions, GHCR, 매니페스트 변경, Argo CD Sync를 수행한다.
 
-### GitOps 기본 실습 범위
+### GitOps + Helm 기본 실습 범위
 
 기본 실습은 수동 이미지 태그 변경 방식으로 운영한다.
 
 ```text
 GitHub Actions가 이미지 빌드/푸시
 → 수강생이 이미지 태그 확인
-→ Antigravity IDE에서 day3/k8s/app-deployment.yml 이미지 태그 수동 변경
+→ Antigravity IDE에서 기본 매니페스트 이미지 태그 수동 변경
+→ Helm chart 작성 및 values.yaml의 image.repository/tag 값 변경
 → git commit / push
 → Argo CD가 OutOfSync 감지
 → 수동 Sync
@@ -269,6 +272,18 @@ GitHub Actions가 이미지 빌드/푸시
 → 장애 확인
 → git revert 또는 Argo CD rollback으로 복구
 ```
+
+### Helm 학습 주제
+
+Helm은 3일차의 별도 학습 주제로 운영한다. Kustomize는 별도 챕터로 키우지 않고, Kubernetes YAML을 재사용 가능한 배포 패키지로 만드는 관점은 Helm에서 다룬다.
+
+필수 학습 범위:
+
+- Helm chart 구성 요소: `Chart.yaml`, `values.yaml`, `templates/`
+- 앱 Deployment 템플릿화: image repository/tag, replicas, resources를 values로 분리
+- `helm template`으로 렌더링 결과 확인
+- Argo CD Application source를 Helm chart path로 등록하는 방식
+- raw manifest 수정 방식과 Helm values 수정 방식의 장단점 비교
 
 ### 자동 manifest 갱신의 위치
 
@@ -293,18 +308,19 @@ GitHub Actions가 이미지 빌드/푸시
 | 시간 | 모듈 | 내용 | 운영 메모 |
 |---|---|---|---|
 | 09:00~10:00 | 모듈 1 | CI/CD 구조와 GitOps 이해 | CI와 CD 역할 분리 |
-| 10:00~11:30 | 모듈 2 | GitHub Actions CI 구성 | fork, Actions, GHCR 확인 |
-| 11:30~12:30 | 모듈 3 | 이미지 태그 확인과 수동 매니페스트 변경 | 기본 실습 핵심 |
+| 10:00~11:20 | 모듈 2 | GitHub Actions CI 구성 | fork, Actions, GHCR 확인 |
+| 11:20~12:30 | 모듈 3 | 이미지 태그 확인과 수동 매니페스트 변경 | 기본 GitOps 흐름 확보 |
 | 12:30~13:30 | 점심 |  |  |
-| 13:30~15:00 | 모듈 4 | Argo CD 설치 및 앱 등록 | 설치 지연 가능성 고려 |
-| 15:00~16:30 | 모듈 5 | 수동 Sync와 자동 Sync 개념 | 기본은 수동 Sync |
-| 16:30~18:00 | 모듈 6 | 잘못된 이미지 태그 장애 재현 및 롤백 | 마지막은 롤백 완료까지 진행 |
+| 13:30~14:40 | 모듈 4 | Helm 기본과 차트 구조 | Helm을 별도 학습 주제로 운영 |
+| 14:40~16:00 | 모듈 5 | Argo CD 설치 및 앱 등록 | plain manifest와 Helm chart source 등록 |
+| 16:00~18:00 | 모듈 6 | Sync, 장애 재현, 롤백 | 마지막은 롤백 완료까지 진행 |
 
 ### 3일차 완료 기준
 
 - 수강생 fork 저장소에서 GitHub Actions가 성공한다.
 - GHCR에 이미지가 생성된다.
-- 수강생이 이미지 태그를 확인하고 `day3/k8s/app-deployment.yml`에 수동 반영한다.
+- 수강생이 이미지 태그를 확인하고 기본 매니페스트에 수동 반영한다.
+- Helm chart를 만들고 `values.yaml`로 이미지 태그를 분리해 관리할 수 있다.
 - Git commit/push 후 Argo CD에서 OutOfSync를 확인한다.
 - 수동 Sync 후 Pod와 API가 정상 동작한다.
 - 잘못된 이미지 태그 배포로 장애를 재현하고 복구한다.
@@ -347,6 +363,7 @@ CI/CD + GitOps + 롤백까지 성공.
 - GitHub Actions 성공
 - GHCR 이미지 생성
 - `app-deployment.yml` 이미지 태그 수동 변경
+- Helm chart 작성 및 `values.yaml` 이미지 값 변경
 - git commit/push
 - Argo CD OutOfSync 확인
 - 수동 Sync
@@ -404,6 +421,7 @@ CI/CD + GitOps + 롤백까지 성공.
 - GitHub Actions 성공 이력
 - GHCR 이미지 생성 이력
 - `day3/k8s/app-deployment.yml` 이미지 태그 변경 commit
+- `day3/helm/todo-app` Helm chart/values 작성 commit
 - 롤백 또는 revert commit
 
 ---
@@ -497,10 +515,10 @@ CI/CD + GitOps + 롤백까지 성공.
 
 ### P2 — 품질 향상
 
-- [ ] 수강생 실습지와 강사용 기획안의 표현을 분리한다.
-- [ ] 각 모듈에 예상 소요시간과 성공 조건을 명확히 적는다.
-- [ ] 장애 실습은 전원 직접 실습과 강사 데모로 구분한다.
-- [ ] 최종 완료 기준을 Basic/Standard/Advanced로 정리한다.
+- [x] 수강생 실습지와 강사용 기획안의 표현을 분리한다.
+- [x] 각 모듈에 예상 소요시간과 성공 조건을 명확히 적는다.
+- [x] 장애 실습은 전원 직접 실습과 강사 데모로 구분한다.
+- [x] 최종 완료 기준을 Basic/Standard/Advanced로 정리한다.
 
 ---
 

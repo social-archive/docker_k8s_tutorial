@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------
+# todo-app Helm chart — values.yaml
+#
+# 이미지 태그, 레플리카 수, 리소스 제한을 values로 분리해
+# raw manifest의 직접 수정 없이 배포 변경점을 관리한다.
+# -----------------------------------------------------------------------
+
+image:
+  repository: ghcr.io/YOUR_GITHUB_USERNAME/todo-app
+  # GitHub Actions / GHCR에서 확인한 7자리 short SHA 태그로 변경한다.
+  tag: "replace-with-short-sha"
+  pullPolicy: Always
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+# 앱이 읽는 ConfigMap 이름 (2일차 실습 결과물)
+configMapName: app-config
+
+# 앱이 읽는 Secret 이름 (2일차 실습 결과물)
+secretName: db-secret

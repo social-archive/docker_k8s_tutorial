@@ -1,0 +1,10 @@
+apiVersion: v2
+name: todo-app
+description: Spring Boot Todo 애플리케이션 Helm chart (실습용)
+type: application
+
+# chart 버전 — values 변경 시 patch 올리기
+version: 0.1.0
+
+# 배포 대상 애플리케이션 버전
+appVersion: "1.0"

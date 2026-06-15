@@ -41,8 +41,12 @@ cd ..\day2
 
 ## 3-3. 앱 ConfigMap 먼저 적용
 
-Spring 앱 Deployment는 `app-config` ConfigMap에서 DB 접속 정보를 읽는다.
-따라서 앱 Deployment를 만들기 전에 ConfigMap을 먼저 생성해야 한다.
+Spring 앱 Deployment는 `app-config` ConfigMap에서 DB 호스트, 포트, DB명을 환경변수로 읽는다.
+Deployment가 Pod를 기동할 때 ConfigMap이 존재하지 않으면 `CreateContainerConfigError`가 발생한다.
+따라서 Deployment를 만들기 전에 ConfigMap을 반드시 먼저 생성해야 한다.
+
+> 💡 ConfigMap의 내용과 동작 원리는 **모듈 4**에서 자세히 다룬다.
+> 지금은 "Deployment가 읽어야 할 설정 파일을 미리 만들어 두는 것"으로 이해하면 된다.
 
 ```powershell
 kubectl apply -f k8s/app-configmap.yml -n todo-app

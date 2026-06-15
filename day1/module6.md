@@ -1,7 +1,8 @@
 # 모듈 6 — 운영 관점 점검과 2일차 연결
 
-> **목표**: 오늘 실습에서 발생할 수 있는 오류들을 점검하고
-> 2일차 Kubernetes 배포 실습으로의 연결 고리를 확인한다.
+> **목표**: 1일차에 배운 것을 운영 관점으로 한 번 더 확인하고
+> Docker의 동작 원리(레이어·볼륨)를 실험을 통해 체감한다.
+> Compose 구조가 내일 Kubernetes 리소스와 어떻게 연결되는지 미리 파악한다.
 
 ---
 
@@ -24,7 +25,91 @@
 
 ---
 
-## 6-2. 자주 발생하는 오류 점검
+## 6-2. Docker 이미지 레이어 확인
+
+Docker 이미지는 여러 **레이어**로 쌓여 있다.
+Dockerfile의 각 명령(FROM, COPY, RUN 등)이 레이어 하나를 만든다.
+레이어 캐시 덕분에 두 번째 빌드부터 빠르게 완료된다.
+
+```powershell
+# 이미지 레이어 목록 확인
+docker history todo-app:1.0
+```
+
+**출력 예시**
+
+```
+IMAGE          CREATED        CREATED BY                                SIZE
+xxxxxxxxxxxx   2 hours ago    ENTRYPOINT ["java", "-jar", "app.jar"]    0B
+<missing>      2 hours ago    COPY --from=builder /workspace/build/…    54MB
+<missing>      2 hours ago    FROM eclipse-temurin:17-jre-alpine        184MB
+```
+
+> 💡 멀티스테이지 빌드 덕분에 JDK가 아닌 JRE만 포함된다.
+> "빌드 도구(JDK)는 최종 이미지에 없어도 된다"는 원칙을 레이어로 확인할 수 있다.
+
+---
+
+## 6-3. 볼륨 — 컨테이너가 종료되면 데이터는?
+
+컨테이너는 기본적으로 **일회성**이다. 컨테이너를 삭제하면 내부 데이터도 사라진다.
+볼륨(Volume)은 컨테이너 바깥에 데이터를 저장해 이 문제를 해결한다.
+
+**실험 1: 볼륨 없이 데이터 저장**
+
+```powershell
+# 이미 실행 중인 Compose 서비스 정리
+docker compose down
+
+# 볼륨까지 삭제 후 재기동
+docker compose down -v
+docker compose up -d
+
+# 할 일 추가
+curl.exe -X POST http://localhost:8080/todos `
+  -H "Content-Type: application/json" `
+  -d '{"title":"볼륨 실험"}'
+
+# 목록 확인 (데이터 있음)
+curl.exe http://localhost:8080/todos
+```
+
+**실험 2: 컨테이너 재시작 후 데이터 유지 확인**
+
+```powershell
+# compose down은 볼륨 유지
+docker compose down
+
+# 다시 기동
+docker compose up -d
+
+# 목록 재확인 (볼륨이 있으면 데이터가 살아 있음)
+curl.exe http://localhost:8080/todos
+```
+
+**실험 3: 볼륨까지 삭제 후 데이터 소실 확인**
+
+```powershell
+# -v 옵션으로 볼륨도 삭제
+docker compose down -v
+
+# 다시 기동
+docker compose up -d
+
+# 목록 재확인 (데이터 없음 - 빈 배열)
+curl.exe http://localhost:8080/todos
+```
+
+| 명령 | 볼륨 유지 여부 | 데이터 |
+|---|---|---|
+| `docker compose down` | ✅ 유지 | 살아 있음 |
+| `docker compose down -v` | ❌ 삭제 | 사라짐 |
+
+> 💡 2일차 Kubernetes에서는 **PersistentVolumeClaim(PVC)**이 이 볼륨 역할을 한다.
+
+---
+
+## 6-4. 자주 발생하는 오류 점검
 
 ### Docker 관련
 
@@ -45,7 +130,7 @@
 
 ---
 
-## 6-3. 포트 충돌 해결 방법
+## 6-5. 포트 충돌 해결 방법
 
 ```powershell
 # 8080 포트를 사용 중인 프로세스 확인
@@ -57,7 +142,7 @@ taskkill /PID <PID번호> /F
 
 ---
 
-## 6-4. 남은 컨테이너 정리
+## 6-6. 남은 컨테이너 정리
 
 ```powershell
 # 실행 중인 모든 컨테이너 확인
@@ -72,20 +157,24 @@ docker image prune -f
 
 ---
 
-## 6-5. 2일차 연결 포인트
+## 6-7. Docker Compose → Kubernetes 매핑
 
-1일차에서 만든 것들이 2일차에 어떻게 연결되는지 확인한다.
+오늘 만든 Compose 구조가 내일 Kubernetes에서는 어떤 리소스로 바뀌는지 미리 파악한다.
 
-| 1일차 산출물 | 2일차 활용 |
-|---|---|
-| `todo-app:1.0` 이미지 | Kubernetes Deployment에서 이 이미지를 사용 |
-| `.env`의 DB 환경변수 구조 | Kubernetes Secret/ConfigMap으로 변환 |
-| `compose.yml`의 서비스 구조 | Deployment + Service 매니페스트로 변환 |
-| 활성화된 Kubernetes 클러스터 | 2일차 전체 실습의 기반 |
+| Docker Compose | Kubernetes 대응 | 내일 실습 |
+|---|---|---|
+| `services.app` (Spring) | `Deployment` | `app-deployment.yml` |
+| `services.postgres` | `Deployment` | `postgres-deployment.yml` |
+| `ports: 8080:8080` | `Service (NodePort 30080)` | `app-service.yml` |
+| `env_file: .env` → `DB_HOST` | `ConfigMap` → `DB_HOST` | `app-configmap.yml` |
+| `env_file: .env` → `DB_PASSWORD` | `Secret` → `db-password` | `app-secret.yml` |
+| `volumes: postgres-data` | `PersistentVolumeClaim` | `postgres-pvc.yml` |
+
+> 💡 이 표를 내일 Kubernetes 실습을 시작할 때 다시 보면 이해가 빠르다.
 
 ---
 
-## 6-6. 2일차 사전 확인
+## 6-8. 2일차 사전 확인
 
 ```powershell
 # 내일 실습 전 아래 명령이 모두 정상 동작해야 한다
@@ -101,6 +190,7 @@ kubectl config current-context
 - [ ] `docker version` 명령이 정상 출력된다
 - [ ] Spring 앱 이미지(`todo-app:1.0`) 빌드가 성공했다
 - [ ] `docker compose up` 후 `http://localhost:8080/todos` 응답이 온다
+- [ ] 볼륨 실험: `docker compose down -v` 후 데이터가 사라짐을 확인했다
 - [ ] `kubectl get nodes`에서 `docker-desktop` 노드가 `Ready` 상태다
 
 ---

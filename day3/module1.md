@@ -51,11 +51,15 @@ Antigravity IDE 또는 사용 중인 IDE에서 아래 구조를 확인한다.
 ```
 docker_k8s_tutorial/
 ├── .github/workflows/
-│   └── ci.yml          ← GitHub Actions CI workflow
+│   └── ci.yml              ← GitHub Actions CI workflow
 └── day3/
-    └── k8s/
-        ├── app-deployment.yml   ← 이미지 태그 수동 변경 대상
-        └── kustomization.yml    ← Argo CD가 참조하는 진입점
+    ├── k8s/
+    │   ├── app-deployment.yml   ← raw manifest (과거 수동 배포 방식 비교용)
+    │   └── helm/
+    │       ├── Chart.yaml       ← Helm chart 메타데이터
+    │       ├── values.yaml      ← 이미지 태그·replicas·resources 변경 지점
+    │       └── templates/
+    │           └── deployment.yaml  ← Deployment 템플릿
 ```
 
 ---
@@ -85,7 +89,8 @@ git branch
 ## 1-5. 2일차 리소스 선행조건
 
 3일차 GitOps 실습은 2일차에서 만든 Kubernetes 리소스를 이어서 사용한다.
-`day3/k8s`는 전체 애플리케이션 신규 설치용 디렉토리가 아니라, Argo CD가 관리할 애플리케이션 Deployment 매니페스트를 담는 디렉토리다.
+`day3/k8s/helm`은 같은 앱 Deployment를 Helm chart로 패키징한 실습 디렉토리다.
+Argo CD에서 이 경로를 source로 등록하면 Helm chart로 배포를 관리할 수 있다.
 
 Argo CD 등록 전에 아래 리소스가 이미 `todo-app` 네임스페이스에 있어야 한다.
 
@@ -104,7 +109,7 @@ kubectl get secret db-secret -n todo-app
 ## ✅ 모듈 1 완료 기준
 
 - [ ] CI(GitHub Actions)와 CD(Argo CD)의 역할 차이를 설명할 수 있다
-- [ ] 오늘 실습할 파일 구조(`ci.yml`, `day3/k8s/`)를 파악했다
+- [ ] 오늘 실습할 파일 구조(`ci.yml`, `day3/k8s/`, `day3/k8s/helm/`)를 파악했다
 - [ ] 본인 GitHub fork 저장소가 `origin`으로 연결되어 있다
 - [ ] 2일차 리소스(Service/ConfigMap/Secret/PostgreSQL)가 `todo-app` 네임스페이스에 남아 있다
 

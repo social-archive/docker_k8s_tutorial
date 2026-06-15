@@ -1,154 +1,232 @@
-# 모듈 4 — Argo CD 설치 및 앱 등록
+# 모듈 4 — Helm 기본과 차트 구조
 
-> **목표**: 로컬 Kubernetes 환경에 Argo CD를 구축하고
-> Git 저장소를 Argo CD에 등록해 클러스터와 Git의 동기화를 준비한다.
+> **목표**: Kubernetes YAML을 반복·재사용하기 어렵다는 문제를 Helm chart로 해결하는 구조를 이해한다.
+> 앱 Deployment의 이미지 태그·replicas·resources를 `values.yaml`로 분리하고,
+> `helm template`으로 렌더링 결과를 확인한다.
 
 ---
 
 > 모든 명령은 Windows PowerShell 기준입니다.
 > 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
-> 실행 위치는 저장소 루트 `docker_k8s_tutorial/` 기준입니다. (`git add day3/k8s/...` 경로가 루트 기준입니다.)
+> 실행 위치는 저장소 루트 `docker_k8s_tutorial/` 기준입니다.
 
-## 4-1. Argo CD 설치
+## 4-1. Helm이 필요한 이유
 
-```powershell
-# argocd 네임스페이스 생성
-kubectl create namespace argocd
+지금까지 `day3/k8s/app-deployment.yml`에서 이미지 태그를 직접 수정했다.
+이 방식은 간단하지만, 환경이 여러 개이거나 변경점을 추적할 기준이 모호하다.
 
-# Argo CD 설치
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-
-# 설치 완료 대기 (모든 Pod가 Running이 될 때까지)
-kubectl get pods -n argocd -w
-```
-
-> ⏳ 처음 설치 시 이미지 다운로드로 2~5분 소요된다.
-
-**k9s로 설치 진행 모니터링 (권장)**
-
-```powershell
-k9s
-```
-`:pod` → `argocd` 네임스페이스 선택 → Pod 상태 확인
-
----
-
-## 4-2. Argo CD UI 접근
-
-```powershell
-# 로컬에서 접근하기 위한 포트 포워딩
-kubectl port-forward svc/argocd-server -n argocd 8443:443
-```
-
-브라우저에서 `https://localhost:8443` 접속
-(인증서 경고는 무시하고 진행)
-
----
-
-## 4-3. 초기 비밀번호 확인
-
-```powershell
-# admin 초기 비밀번호 확인
-kubectl get secret argocd-initial-admin-secret -n argocd `
-  -o jsonpath="{.data.password}" | %{[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($_))}
-```
-
-- **ID**: `admin`
-- **Password**: 위 명령 출력값
-
----
-
-## 4-4. Argo CD CLI 설치 (선택)
-
-```powershell
-# winget으로 설치
-winget install ArgoProj.ArgoCD
-
-# 로그인
-argocd login localhost:8443 --username admin --password <위의 비밀번호> --insecure
-```
-
----
-
-## 4-5. 2일차 기반 리소스 확인
-
-Argo CD Application을 등록하기 전에 2일차 실습 결과가 클러스터에 남아 있는지 확인한다.
-
-```powershell
-# namespace 확인
-kubectl get namespace todo-app
-
-# 2일차에서 만든 기반 리소스 확인
-kubectl get svc,configmap,secret,pvc -n todo-app
-kubectl get deployment postgres -n todo-app
-```
-
-필수 전제:
-
-| 리소스 | 2일차 생성 파일 | 3일차에서 필요한 이유 |
+| 방식 | 특징 | 단점 |
 |---|---|---|
-| `todo-app` Namespace | `day2/k8s/namespace.yml` | Argo CD 배포 대상 namespace |
-| `todo-app` Service | `day2/k8s/app-service.yml` | `localhost:30080` API 확인 |
-| `postgres` Service/Deployment/PVC | `day2/k8s/postgres-*.yml` | Spring 앱 DB 연결 |
-| `app-config` ConfigMap | `day2/k8s/app-configmap.yml` | `DB_HOST`, `DB_PORT`, `DB_NAME` 주입 |
-| `db-secret` Secret | `day2/k8s/app-secret.yml` | DB 계정/비밀번호 주입 |
+| raw manifest | YAML 그대로 관리 | 환경별 복사본이 늘어남 |
+| Helm chart | 템플릿 + values 분리 | 구조 파악에 초기 학습 필요 |
 
-> ⚠️ `day3/k8s`에는 Argo CD가 관리할 `app-deployment.yml`과 `kustomization.yml`만 있다.
-> 위 기반 리소스가 없으면 Argo CD Sync는 되더라도 앱 Pod가 `CreateContainerConfigError`, `CrashLoopBackOff`, DB 연결 실패 상태가 될 수 있다.
+Helm은 Kubernetes 리소스를 재사용 가능한 **chart(패키지)**로 관리하는 도구다.
+
+> 이번 모듈에서는 전체 스택을 새로 설치하지 않고, **앱 Deployment만 Helm chart로 패키징**한다.
+> Service, ConfigMap, Secret, PostgreSQL은 2일차 실습 결과를 그대로 사용한다.
 
 ---
 
-## 4-6. Argo CD Application 등록
+## 4-2. Helm CLI 설치 확인
 
-Argo CD UI 또는 CLI로 애플리케이션을 등록한다.
+```powershell
+helm version
+```
 
-**UI 방식**
+**설치가 안 되어 있으면**
 
-1. `https://localhost:8443` 접속 → 로그인
-2. **New App** 클릭
-3. 아래 값 입력:
+```powershell
+# winget 설치 (권장)
+winget install Helm.Helm
 
-| 항목 | 값 |
+# 설치 후 터미널 새로 열기
+helm version
+```
+
+---
+
+## 4-3. Helm chart 구조 확인
+
+Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s/helm/` 디렉토리를 확인한다.
+
+```
+day3/k8s/helm/
+├── Chart.yaml               ← chart 이름, 버전 정보
+├── values.yaml              ← 변경 가능한 기본값 모음
+└── templates/
+    └── deployment.yaml      ← {{ .Values.* }} 표현식을 사용하는 Deployment 템플릿
+```
+
+---
+
+## 4-4. Chart.yaml 확인
+
+`day3/k8s/helm/Chart.yaml` 내용:
+
+```yaml
+apiVersion: v2
+name: todo-app
+description: Spring Boot Todo 애플리케이션 Helm chart (실습용)
+type: application
+version: 0.1.0
+appVersion: "1.0"
+```
+
+| 필드 | 의미 |
 |---|---|
-| Application Name | `todo-app` |
-| Project | `default` |
-| Repository URL | 본인의 GitHub 저장소 URL |
-| Path | `day3/k8s` |
-| Cluster URL | `https://kubernetes.default.svc` |
-| Namespace | `todo-app` |
-
-4. **Create** 클릭
-
-**CLI 방식**
-
-```powershell
-argocd app create todo-app `
-  --repo https://github.com/<username>/docker_k8s_tutorial.git `
-  --path day3/k8s `
-  --dest-server https://kubernetes.default.svc `
-  --dest-namespace todo-app
-```
+| `name` | chart 이름 |
+| `version` | chart 자체 버전 (values 구조 변경 시 올림) |
+| `appVersion` | 배포 대상 앱의 버전 (참고용) |
 
 ---
 
-## 4-7. 등록 상태 확인
+## 4-5. values.yaml 확인
 
-```powershell
-# CLI로 앱 상태 확인
-argocd app list
-argocd app get todo-app
+`day3/k8s/helm/values.yaml` 내용:
+
+```yaml
+image:
+  repository: ghcr.io/YOUR_GITHUB_USERNAME/todo-app
+  tag: "replace-with-short-sha"
+  pullPolicy: Always
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+configMapName: app-config
+secretName: db-secret
 ```
 
-UI에서는 `OutOfSync` 또는 `Synced` 상태가 표시된다.
+> 💡 이 파일에서 `image.tag`만 변경하면 모듈 3과 동일한 "이미지 태그 반영"이 이루어진다.
+> raw manifest처럼 `image:` 줄을 직접 찾아 수정할 필요가 없다.
+
+---
+
+## 4-6. values.yaml — 이미지 태그 반영
+
+Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s/helm/values.yaml`을 열어
+모듈 3에서 확인한 7자리 short SHA 태그와 본인 GitHub 계정명으로 수정한다.
+
+```yaml
+image:
+  repository: ghcr.io/<본인 GitHub 계정명>/todo-app
+  tag: "<7자리-short-sha>"
+```
+
+> 핵심 비교: 모듈 3에서는 `app-deployment.yml`의 `image:` 한 줄을 직접 바꿨다.
+> Helm에서는 `values.yaml`만 바꾸고, 실제 Deployment YAML은 템플릿에서 생성된다.
+
+---
+
+## 4-7. templates/deployment.yaml 확인
+
+`day3/k8s/helm/templates/deployment.yaml` 핵심 부분:
+
+```yaml
+spec:
+  replicas: {{ .Values.replicaCount }}       # values.replicaCount 참조
+  template:
+    spec:
+      containers:
+        - name: todo-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMapName }}
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName }}
+                  key: db-user
+```
+
+`{{ .Values.* }}` 표현식이 `values.yaml`의 값을 읽어와 YAML을 완성한다.
+
+---
+
+## 4-8. helm template으로 렌더링 결과 확인
+
+`helm template` 명령은 chart를 실제 클러스터에 배포하지 않고,
+values를 반영한 최종 Kubernetes YAML만 출력한다.
+
+> 실행 위치: 저장소 루트 `docker_k8s_tutorial/` 에서 실행한다.
+> (모듈 상단의 실행 위치 안내와 동일)
+
+```powershell
+# 저장소 루트에서 실행
+helm template todo-app day3/k8s/helm
+```
+
+**출력 예시**
+
+```yaml
+---
+# Source: todo-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+  namespace: todo-app
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: todo-app
+          image: "ghcr.io/<계정>/todo-app:<sha>"
+```
+
+이미지 태그만 빠르게 확인하려면:
+
+```powershell
+helm template todo-app day3/k8s/helm | findstr image:
+```
+
+> 💡 출력된 YAML이 `day3/k8s/app-deployment.yml`과 구조적으로 동일하다.
+> 차이는 수정 위치다. raw manifest는 `image:` 줄을 직접 찾지만,
+> Helm은 `values.yaml`의 `image.tag` 한 줄만 바꾸면 된다.
+
+---
+
+## 4-9. raw manifest vs Helm 비교
+
+| 항목 | raw manifest (`day3/k8s/`) | Helm chart (`day3/k8s/helm/`) |
+|---|---|---|
+| 이미지 태그 변경 위치 | `app-deployment.yml` 직접 수정 | `values.yaml`의 `image.tag` 수정 |
+| replicas 변경 위치 | `app-deployment.yml` 직접 수정 | `values.yaml`의 `replicaCount` 수정 |
+| 환경별 설정 분리 | 파일 복사 | values 파일 분리 (`values-prod.yaml`) |
+| Argo CD 연동 | Directory source | Helm source (path + values) |
+
+---
+
+## 4-10. 변경사항 commit / push
+
+values.yaml을 수정했으면 commit/push해서 Git 이력을 남긴다.
+
+```powershell
+git add day3/k8s/helm/values.yaml
+git commit -m "helm: update image tag in values"
+git push origin main
+```
 
 ---
 
 ## ✅ 모듈 4 완료 기준
 
-- [ ] Argo CD가 `argocd` 네임스페이스에 설치되었다
-- [ ] `https://localhost:8443`으로 UI에 접근 가능하다
-- [ ] 2일차 기반 리소스(`todo-app` Service, `postgres`, `app-config`, `db-secret`)가 확인되었다
-- [ ] `todo-app` Application이 Argo CD에 등록되었다
+- [ ] `helm version` 명령이 정상 출력된다
+- [ ] `day3/k8s/helm/` 구조(`Chart.yaml`, `values.yaml`, `templates/`)를 설명할 수 있다
+- [ ] `values.yaml`의 `image.repository`와 `image.tag`를 본인 정보로 수정했다
+- [ ] `helm template todo-app day3/k8s/helm` 결과에서 수정한 이미지 태그가 보인다
+- [ ] raw manifest 수정 방식과 Helm values 수정 방식의 차이를 설명할 수 있다
 
 ---
 

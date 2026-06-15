@@ -13,7 +13,7 @@
 4. [3일 커리큘럼 전체 구성표](#4-3일-커리큘럼-전체-구성표)
 5. [1일차 상세 기획 — Docker / Docker Compose](#5-1일차-상세-기획--docker--docker-compose)
 6. [2일차 상세 기획 — Kubernetes 배포](#6-2일차-상세-기획--kubernetes-배포)
-7. [3일차 상세 기획 — GitHub Actions + Argo CD GitOps](#7-3일차-상세-기획--github-actions--argo-cd-gitops)
+7. [3일차 상세 기획 — GitHub Actions + Helm + Argo CD GitOps](#7-3일차-상세-기획--github-actions--helm--argo-cd-gitops)
 8. [실습 앱 소개](#8-실습-앱-소개)
 9. [프로젝트 파일 구조](#9-프로젝트-파일-구조)
 10. [강의 운영 총괄 원칙](#10-강의-운영-총괄-원칙)
@@ -38,9 +38,9 @@
 ─────────────────────         ─────────────────────         ─────────────────────
 Dockerfile 작성          →    K8s Deployment/Service   →    GitHub Actions CI
 docker build                  ConfigMap / Secret             이미지 태깅
-docker compose up             kubectl 진단 명령               Argo CD GitOps
-Spring + PostgreSQL 연동       운영 관점 문제 진단              롤백 실습
-Kubernetes 활성화 준비          → 3일차 매니페스트 확보          빌드-배포-롤백 한 사이클
+docker compose up             kubectl 진단 명령               Helm 차트 구조 이해
+Spring + PostgreSQL 연동       운영 관점 문제 진단              Argo CD GitOps / 롤백
+Kubernetes 활성화 준비          → 3일차 배포 소스 확보           빌드-패키징-배포-롤백 한 사이클
 ```
 
 ---
@@ -112,6 +112,7 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 | Kubernetes | 1.29 이상 (Docker Desktop 내장) |
 | kubectl | 클러스터 버전 ±1 (Docker Desktop 포함) |
 | Argo CD | 2.10 이상 (3일차 — 로컬 kubectl로 직접 설치) |
+| Helm | 3.14 이상 권장 (3일차 — 별도 학습 주제: chart/values/templates) |
 
 ### IDE 안내 및 VS Code 사용 시 권장 확장
 
@@ -142,7 +143,7 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 |---|---|---|
 | 1일차 Docker / Compose | [`day1/README.md`](./day1/README.md) | [`1`](./day1/module1.md) · [`2`](./day1/module2.md) · [`3`](./day1/module3.md) · [`4`](./day1/module4.md) · [`5`](./day1/module5.md) · [`6`](./day1/module6.md) |
 | 2일차 Kubernetes | [`day2/README.md`](./day2/README.md) | [`1`](./day2/module1.md) · [`2`](./day2/module2.md) · [`3`](./day2/module3.md) · [`4`](./day2/module4.md) · [`5`](./day2/module5.md) · [`6`](./day2/module6.md) |
-| 3일차 GitHub Actions + Argo CD | [`day3/README.md`](./day3/README.md) | [`1`](./day3/module1.md) · [`2`](./day3/module2.md) · [`3`](./day3/module3.md) · [`4`](./day3/module4.md) · [`5`](./day3/module5.md) · [`6`](./day3/module6.md) |
+| 3일차 GitHub Actions + Helm + Argo CD | [`day3/README.md`](./day3/README.md) | [`1`](./day3/module1.md) · [`2`](./day3/module2.md) · [`3`](./day3/module3.md) · [`4`](./day3/module4.md) · [`5`](./day3/module5.md) · [`6`](./day3/module6.md) |
 
 ---
 
@@ -163,11 +164,11 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 | | 15:30~17:00 | 모듈 5 | 통합 검증과 서비스 확인 | 앱-DB 연동 결과 | API 호출, 로그 확인, 상태 점검 |
 | | 17:00~18:00 | 모듈 6 | 운영 관점 문제 진단 입문 | 장애 원인 분석 메모 | describe, logs, rollout 상태 확인 |
 | **3일차** | 09:00~10:00 | 모듈 1 | CI/CD 구조와 GitOps 이해 | CI와 CD 역할 분리 도식 | GitHub Actions와 Argo CD 역할 정리 |
-| | 10:00~11:30 | 모듈 2 | GitHub Actions CI 구성 | workflow 파일 | 테스트, 빌드, 이미지 생성 자동화 |
-| | 11:30~12:30 | 모듈 3 | 버전관리와 이미지 태그 수동 반영 | 변경된 배포 매니페스트 | GHCR 이미지 태그 확인, 매니페스트 수정, commit/push |
-| | 13:30~15:00 | 모듈 4 | Argo CD 설치 및 앱 등록 | Argo CD 애플리케이션 | 로컬 Kubernetes와 Git 저장소 연결 |
-| | 15:00~16:30 | 모듈 5 | 선언형 CD와 동기화 실습 | Sync/OutOfSync 확인 결과 | 수동 Sync, 상태 점검, 자동 Sync 선택 확인 |
-| | 16:30~18:00 | 모듈 6 | 롤백과 운영 체크리스트 | 롤백 절차서, 점검표 | 잘못된 이미지 태그 장애 재현과 복구 |
+| | 10:00~11:20 | 모듈 2 | GitHub Actions CI 구성 | workflow 파일 | 테스트, 빌드, 이미지 생성 자동화 |
+| | 11:20~12:30 | 모듈 3 | 버전관리와 이미지 태그 수동 반영 | 변경된 배포 매니페스트 | GHCR 이미지 태그 확인, manifest 수정, commit/push |
+| | 13:30~14:40 | 모듈 4 | Helm 기본과 차트 구조 | Helm chart 초안, values 변경 | Chart.yaml, values.yaml, templates 역할 이해 및 이미지 태그 반영 |
+| | 14:40~16:00 | 모듈 5 | Argo CD 설치 및 앱 등록 | Argo CD 애플리케이션 | 로컬 Kubernetes와 Git 저장소 연결, Helm chart source 등록 |
+| | 16:00~18:00 | 모듈 6 | Sync, 롤백, 운영 체크리스트 | Sync/OutOfSync 확인, 롤백 절차서 | 잘못된 이미지 태그 장애 재현과 복구 |
 
 ---
 
@@ -282,21 +283,24 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 
 ---
 
-## 7. 3일차 상세 기획 — GitHub Actions + Argo CD GitOps
+## 7. 3일차 상세 기획 — GitHub Actions + Helm + Argo CD GitOps
 
 > **핵심 메시지**: 3일차는 코드 변경이 빌드되고, 이미지가 만들어지고, Git 상태를 기준으로 Kubernetes에 반영되는 전체 흐름을 경험하는 날이다.
 
 ### 학습목표
 
 - GitHub Actions로 빌드와 테스트를 자동화할 수 있다.
-- Docker 이미지 버전을 확인하고, 배포 매니페스트에 수동으로 반영하는 GitOps 기본 흐름을 수행할 수 있다.
+- Docker 이미지 버전을 확인하고, 배포 매니페스트 또는 Helm values에 수동으로 반영하는 GitOps 기본 흐름을 수행할 수 있다.
+- Helm chart의 기본 구성(`Chart.yaml`, `values.yaml`, `templates/`)과 values 기반 배포 설정 변경 방식을 설명할 수 있다.
 - Argo CD로 로컬 Kubernetes 클러스터에 선언형 배포를 적용할 수 있다.
 - 배포 상태를 확인하고 롤백 또는 재동기화로 복구할 수 있다.
 
 ### GitOps 전체 흐름
 
 > 3일차 Argo CD 실습은 2일차에서 만든 `todo-app` 네임스페이스와 `Service`, `ConfigMap`, `Secret`, PostgreSQL 리소스가 클러스터에 남아 있다는 전제로 진행한다.
-> `day3/k8s`는 GitOps로 변경·동기화할 애플리케이션 Deployment만 관리하며, 2일차 기반 리소스(`todo-app` Service, `postgres` Service/Deployment/PVC, `app-config`, `db-secret`)를 다시 생성하지 않는다.
+> 3일차는 `day3/k8s`의 애플리케이션 Deployment로 GitOps 흐름을 먼저 잡은 뒤, Helm을 별도 학습 주제로 다룬다.
+> Helm 파트에서는 같은 앱 배포를 `Chart.yaml`, `values.yaml`, `templates/` 구조로 재구성하고, 이미지 태그 변경 지점을 values로 분리하는 방식을 학습한다.
+> 2일차 기반 리소스(`todo-app` Service, `postgres` Service/Deployment/PVC, `app-config`, `db-secret`)는 다시 생성하지 않는다.
 
 ```
 코드 push (GitHub main 브랜치)
@@ -312,6 +316,9 @@ GitHub Actions (CI)
                 │
                 ▼
   day3/k8s/app-deployment.yml 이미지 태그 수동 변경
+                │
+                ▼
+  Helm chart/values로 같은 변경 지점 구조화
                 │
                 ▼
   Git commit & push
@@ -330,24 +337,24 @@ GitHub Actions (CI)
 
 | 모듈 | 시간 | 내용 |
 |---|---|---|
-| **모듈 1** CI/CD 구조와 GitOps 이해 | 09:00~10:00 | 개발·검증·운영 환경 간 변경 관리 흐름과 GitOps의 핵심 개념을 도식으로 정리한다. 이론 위주보다는 "우리가 수동으로 하던 배포를 어떻게 자동화하는가"의 큰 그림을 먼저 보여준다. |
-| **모듈 2** GitHub Actions CI 구성 | 10:00~11:30 | Spring Boot 코드가 push되었을 때 GitHub Actions가 트리거되어 빌드·테스트를 수행하고 GHCR에 이미지를 push하는 workflow를 작성한다. |
-| **모듈 3** 버전관리와 이미지 태깅 | 11:30~13:00 | GHCR에 생성된 이미지 태그를 확인하고, 수강생이 직접 배포 매니페스트의 이미지 태그를 변경하여 버전 추적 흐름을 이해한다. |
-| **모듈 4** Argo CD 설치 및 앱 등록 | 14:00~15:30 | 로컬 Kubernetes 환경에 Argo CD를 구축하고, Git 배포 저장소를 Argo CD에 등록하여 쿠버네티스 상태와 Git의 동기화를 준비한다. |
-| **모듈 5** 선언형 CD와 동기화 실습 | 15:30~17:00 | Git의 매니페스트 수정이 Argo CD를 거쳐 로컬 쿠버네티스 클러스터로 배포되는 과정을 확인하고 Sync/OutOfSync 상태 변화를 추적한다. |
-| **모듈 6** 롤백과 운영 체크리스트 | 17:00~18:00 | 배포가 실패하거나 오동작할 때 Argo CD 롤백 기능이나 Git revert를 통해 이전 안정화 버전으로 즉각 복구하는 시나리오를 실습한다. |
+| **모듈 1** CI/CD 구조와 GitOps 이해 | 09:00~10:00 | 개발·검증·운영 환경 간 변경 관리 흐름과 GitOps의 핵심 개념을 도식으로 정리한다. |
+| **모듈 2** GitHub Actions CI 구성 | 10:00~11:20 | Spring Boot 코드가 push되었을 때 GitHub Actions가 빌드·테스트를 수행하고 GHCR에 이미지를 push하는 workflow를 작성한다. |
+| **모듈 3** 버전관리와 이미지 태깅 | 11:20~12:30 | GHCR 이미지 태그를 확인하고 `day3/k8s/app-deployment.yml`에 반영해 Git 기반 배포 이력을 만든다. |
+| **모듈 4** Helm 기본과 차트 구조 | 13:30~14:40 | Helm을 별도 학습 주제로 다룬다. `Chart.yaml`, `values.yaml`, `templates/` 구조를 만들고 이미지 태그를 values로 분리한다. |
+| **모듈 5** Argo CD 설치 및 앱 등록 | 14:40~16:00 | 로컬 Kubernetes에 Argo CD를 설치하고, plain manifest 경로와 Helm chart 경로를 Application source로 등록하는 차이를 학습한다. |
+| **모듈 6** Sync, 롤백, 운영 체크리스트 | 16:00~18:00 | 수동 Sync, OutOfSync/Healthy 확인, 잘못된 이미지 태그 장애 재현, Git revert 또는 Argo CD rollback 복구를 실습한다. |
 
 ### 실습 시나리오
 
 | 실습 | 목표 | 체크포인트 | 성공 조건 |
 |---|---|---|---|
 | **실습 1** GitHub Actions CI 파이프라인 구성 | 코드 변경 시 테스트와 빌드가 자동 실행되도록 workflow 작성 | push 또는 PR 발생 시 job이 실행되고, 테스트와 빌드가 성공 | Docker 이미지가 생성되며 레지스트리(GHCR) 반영 완료 |
-| **실습 2** 이미지 태그 수동 반영 | GHCR 이미지 태그를 확인하고 배포 매니페스트에 직접 반영 | 이미지 태그 확인, `day3/k8s/app-deployment.yml` 수정, commit/push | 어떤 이미지 태그가 어떤 Git commit으로 배포됐는지 역추적할 수 있다 |
-| **실습 3** Argo CD 설치와 애플리케이션 등록 | 로컬 Kubernetes에 Argo CD를 설치하고 애플리케이션 등록 | Argo CD UI/CLI 접근, 앱 등록, Sync 상태 확인 | Git 저장소의 매니페스트가 클러스터 대상 앱으로 연결된다 |
-| **실습 4** 선언형 배포와 동기화 확인 | Git 저장소의 변경이 클러스터에 반영되는 흐름 확인 | 매니페스트 수정, Sync 실행, Pod/Service 상태 확인 | Argo CD에서 동기화 성공 상태를 확인하고 애플리케이션이 정상 응답 |
+| **실습 2** 이미지 태그 수동 반영 | GHCR 이미지 태그를 확인하고 기본 매니페스트에 직접 반영 | 이미지 태그 확인, `day3/k8s/app-deployment.yml` 수정, commit/push | 어떤 이미지 태그가 어떤 Git commit으로 배포됐는지 역추적할 수 있다 |
+| **실습 3** Helm 차트 작성 | 앱 Deployment를 Helm chart로 패키징하고 values로 변경점을 분리 | `Chart.yaml`, `values.yaml`, `templates/deployment.yaml`, `helm template` 결과 확인 | raw manifest와 Helm values 방식의 차이를 설명할 수 있다 |
+| **실습 4** Argo CD 설치와 애플리케이션 등록 | 로컬 Kubernetes에 Argo CD를 설치하고 plain manifest/Helm chart 앱 등록 | Argo CD UI/CLI 접근, 앱 등록, Sync 상태 확인 | Git 저장소의 manifest 또는 Helm chart가 클러스터 대상 앱으로 연결된다 |
 | **실습 5** 롤백 및 복구 | 잘못된 버전이나 설정을 되돌리고 서비스 정상 상태 복구 | 이전 revision 선택, rollback 또는 재동기화 수행, 정상 상태 확인 | 이전 정상 버전으로 서비스가 복구된다 |
 
-### Argo CD 설치 절차 (모듈 4 실습)
+### Argo CD 설치 절차 (모듈 5 실습)
 
 ```powershell
 # 1. argocd 네임스페이스 생성
@@ -370,7 +377,7 @@ kubectl get secret argocd-initial-admin-secret -n argocd `
 # 브라우저에서 https://localhost:8443 접속 (ID: admin)
 ```
 
-### Argo CD 앱 등록 (모듈 4 실습)
+### Argo CD 앱 등록 (모듈 5 실습)
 
 ```powershell
 # CLI로 등록
@@ -378,10 +385,13 @@ argocd login localhost:8443 --insecure
 
 argocd app create todo-app `
   --repo https://github.com/[계정명]/docker_k8s_tutorial.git `
-  --path day3/k8s `
+  --path day3/k8s/helm `
   --dest-server https://kubernetes.default.svc `
   --dest-namespace todo-app
 ```
+
+> Argo CD가 `day3/k8s/helm` 경로에서 `Chart.yaml`을 감지하면 자동으로 Helm source로 인식한다.
+> 이미지 태그 변경은 `values.yaml`의 `image.tag`에서 수행한다.
 
 ### Argo CD 동기화 상태 설명
 
@@ -395,8 +405,8 @@ argocd app create todo-app `
 
 ### 강의 운영 포인트
 
-- 도구 소개보다 **빌드-배포-롤백이 한 흐름으로 이어진다**는 경험을 주는 데 집중한다.
-- GitHub Actions는 CI 전용, Argo CD는 CD 전용으로 역할을 명확히 분리하면 수강생 이해도가 높다.
+- 도구 소개보다 **빌드-패키징-배포-롤백이 한 흐름으로 이어진다**는 경험을 주는 데 집중한다.
+- GitHub Actions는 CI, Helm은 배포 패키징, Argo CD는 CD/GitOps로 역할을 명확히 분리하면 수강생 이해도가 높다.
 - 자동 동기화만 강조하면 롤백 개념이 흐려질 수 있으므로, 처음에는 수동 Sync와 롤백을 보여준 뒤 자동화로 넘어가는 편이 좋다.
 - 로컬 Kubernetes 환경이므로 외부 클라우드 연결 이슈 없이 GitOps 개념 자체를 학습하는 데 집중한다.
 
@@ -486,12 +496,16 @@ docker_k8s_tutorial/
 │       └── app-service.yml            ← NodePort (localhost:30080)
 │
 ├── day3/                              ← 3일차 실습 파일
-│   ├── README.md                      ← 실습 가이드 (GitOps 흐름 포함)
+│   ├── README.md                      ← 실습 가이드 (GitOps + Helm 흐름 포함)
 │   └── k8s/
-│       ├── app-deployment.yml         ← 수강생이 GHCR short SHA 이미지 태그를 수동 반영하는 대상
-│       └── kustomization.yml          ← Argo CD가 day3/k8s를 읽는 진입점
+│       ├── app-deployment.yml         ← raw manifest (이미지 태그 수동 변경 대상)
+│       └── helm/
+│           ├── Chart.yaml             ← Helm chart 메타데이터
+│           ├── values.yaml            ← 이미지 태그/replicas/resources 변경 지점
+│           └── templates/
+│               └── deployment.yaml    ← Deployment 템플릿
 │
-│   ※ day3/k8s는 app Deployment만 포함한다. Service/ConfigMap/Secret/PostgreSQL은 day2 실습 결과를 전제로 한다.
+│   ※ day3/k8s/helm 은 app Deployment만 포함한다. Service/ConfigMap/Secret/PostgreSQL은 day2 실습 결과를 전제로 한다.
 │
 └── .github/
     └── workflows/
