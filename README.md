@@ -1,6 +1,6 @@
 # DevOps를 위한 Docker & Kubernetes 실무 — 강의기획서
 
-> Spring Boot + PostgreSQL Todo API를 직접 컨테이너화하고,  
+> Spring Boot + PostgreSQL Todo API를 직접 컨테이너화하고,
 > Docker Compose → Kubernetes → GitOps(CI/CD) 순서로 배포 경험을 쌓는 실무 중심 3일 과정.
 
 ---
@@ -71,10 +71,11 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 |---|---|---|---|
 | **Docker Desktop** | 4.30 이상 | 컨테이너 실행 + 로컬 Kubernetes | [docker.com](https://www.docker.com/products/docker-desktop/) |
 | **Git** | 2.40 이상 | 소스 관리 / GitOps | [git-scm.com](https://git-scm.com/) |
-| **Visual Studio Code** | 최신 | 코드 및 YAML 편집 | [code.visualstudio.com](https://code.visualstudio.com/) |
+| **Antigravity IDE** | 최신 | 권장 코드/YAML 편집 환경 | — |
+| **VS Code / IntelliJ IDEA** | 최신 | 대체 가능 IDE | — |
 | **kubectl** | 1.29 이상 | Kubernetes CLI (Docker Desktop에 포함) | — |
 
-> **Java / Gradle 별도 설치 불필요**  
+> **Java / Gradle 별도 설치 불필요**
 > 제공되는 Dockerfile에 멀티스테이지 빌드가 포함되어 있어, `docker build` 한 번으로 JAR 빌드부터 이미지 생성까지 자동 처리된다.
 
 ### Docker Desktop 권장 리소스 (`Settings → Resources`)
@@ -112,7 +113,10 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 | kubectl | 클러스터 버전 ±1 (Docker Desktop 포함) |
 | Argo CD | 2.10 이상 (3일차 — 로컬 kubectl로 직접 설치) |
 
-### 권장 VS Code 확장
+### IDE 안내 및 VS Code 사용 시 권장 확장
+
+> 기본 실습 설명은 Antigravity IDE 기준이며, VS Code 또는 IntelliJ IDEA를 사용해도 된다.
+> 아래 확장은 VS Code를 사용할 때의 권장 항목이다.
 
 | 확장 | 용도 |
 |---|---|
@@ -123,16 +127,35 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 
 ---
 
+### 운영 문서
+
+| 문서 | 역할 |
+|---|---|
+| [`course-design-detail.md`](./course-design-detail.md) | 전체 강의 설계 기준 문서 |
+| [`preflight.md`](./preflight.md) | 강의 전 사전 설치/점검 가이드 |
+| [`troubleshooting.md`](./troubleshooting.md) | Docker/Kubernetes/GitOps 문제 해결 가이드 |
+| [`instructor-runbook.md`](./instructor-runbook.md) | 강사용 진행표와 운영 체크포인트 |
+
+### 일차별 실습 모듈 바로가기
+
+| 일차 | 가이드 | 모듈 링크 |
+|---|---|---|
+| 1일차 Docker / Compose | [`day1/README.md`](./day1/README.md) | [`1`](./day1/module1.md) · [`2`](./day1/module2.md) · [`3`](./day1/module3.md) · [`4`](./day1/module4.md) · [`5`](./day1/module5.md) · [`6`](./day1/module6.md) |
+| 2일차 Kubernetes | [`day2/README.md`](./day2/README.md) | [`1`](./day2/module1.md) · [`2`](./day2/module2.md) · [`3`](./day2/module3.md) · [`4`](./day2/module4.md) · [`5`](./day2/module5.md) · [`6`](./day2/module6.md) |
+| 3일차 GitHub Actions + Argo CD | [`day3/README.md`](./day3/README.md) | [`1`](./day3/module1.md) · [`2`](./day3/module2.md) · [`3`](./day3/module3.md) · [`4`](./day3/module4.md) · [`5`](./day3/module5.md) · [`6`](./day3/module6.md) |
+
+---
+
 ## 4. 3일 커리큘럼 전체 구성표
 
 | 일차 | 시간 | 모듈 | 핵심 주제 | 학습성과(산출물) | 실습/활동 |
 |---|---:|---|---|---|---|
-| **1일차** | 09:00~10:00 | 모듈 1 | Docker Desktop 실습 환경 준비 | Docker 실행 가능 로컬 환경 | 설치 확인, CLI 점검, 리소스 설정 |
-| | 10:00~11:30 | 모듈 2 | Docker 기본 개념과 컨테이너 실행 | 단일 컨테이너 실행 결과 | 이미지/컨테이너 확인, 포트 매핑 실습 |
-| | 11:30~13:00 | 모듈 3 | Spring 애플리케이션 컨테이너화 | Dockerfile, 애플리케이션 이미지 | JAR 빌드, Docker 이미지 생성 |
-| | 14:00~16:00 | 모듈 4 | Docker Compose 기반 Spring + PostgreSQL 연동 | compose.yml, 통합 실행 결과 | 앱-DB 연계 실행, 환경변수 분리 |
-| | 16:00~17:00 | 모듈 5 | Kubernetes 개요와 로컬 준비 | Docker Desktop Kubernetes 활성화 상태 | kubectl 연결 확인 |
-| | 17:00~18:00 | 모듈 6 | 운영 관점 점검과 2일차 연결 | 실습 점검표, 장애 포인트 메모 | 로그 확인, 실패 원인 정리 |
+| **1일차** | 09:00~10:30 | 모듈 1 | 사전 설치 점검 + Docker Desktop/WSL2 복구 | Docker 실행 가능 로컬 환경 | 설치 확인, CLI 점검, 리소스 설정 |
+| | 10:30~11:30 | 모듈 2 | Docker 기본 개념과 컨테이너 실행 | 단일 컨테이너 실행 결과 | 이미지/컨테이너 확인, 포트 매핑 실습 |
+| | 11:30~12:30 | 모듈 3 | Spring 애플리케이션 컨테이너화 | Dockerfile, 애플리케이션 이미지 | JAR 빌드, Docker 이미지 생성 |
+| | 13:30~15:30 | 모듈 4 | Docker Compose 기반 Spring + PostgreSQL 연동 | compose.yml, 통합 실행 결과 | 앱-DB 연계 실행, 환경변수 분리 |
+| | 15:30~16:30 | 모듈 5 | Kubernetes 개요와 로컬 준비 | Docker Desktop Kubernetes 활성화 상태 | kubectl 연결 확인 |
+| | 16:30~18:00 | 모듈 6 | 운영 관점 점검과 2일차 연결 | 실습 점검표, 장애 포인트 메모 | 로그 확인, 실패 원인 정리 |
 | **2일차** | 09:00~10:00 | 모듈 1 | Kubernetes 기본 구조 이해 | 로컬 클러스터 점검 결과 | node, pod, namespace 조회 |
 | | 10:00~11:30 | 모듈 2 | PostgreSQL 쿠버네티스 배포 | DB Deployment, Service, PVC | DB 기동 및 내부 접근 확인 |
 | | 11:30~13:00 | 모듈 3 | Spring 애플리케이션 배포 | App Deployment, Service | 애플리케이션 Pod 기동 |
@@ -141,10 +164,10 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 | | 17:00~18:00 | 모듈 6 | 운영 관점 문제 진단 입문 | 장애 원인 분석 메모 | describe, logs, rollout 상태 확인 |
 | **3일차** | 09:00~10:00 | 모듈 1 | CI/CD 구조와 GitOps 이해 | CI와 CD 역할 분리 도식 | GitHub Actions와 Argo CD 역할 정리 |
 | | 10:00~11:30 | 모듈 2 | GitHub Actions CI 구성 | workflow 파일 | 테스트, 빌드, 이미지 생성 자동화 |
-| | 11:30~13:00 | 모듈 3 | 버전관리와 이미지 태깅 | 버전 규칙 문서 | 커밋 SHA, 릴리스 기준 정리 |
-| | 14:00~15:30 | 모듈 4 | Argo CD 설치 및 앱 등록 | Argo CD 애플리케이션 | 로컬 Kubernetes와 Git 저장소 연결 |
-| | 15:30~17:00 | 모듈 5 | 선언형 CD와 동기화 실습 | Sync/OutOfSync 확인 결과 | 수동 동기화, 자동 반영, 상태 점검 |
-| | 17:00~18:00 | 모듈 6 | 롤백과 운영 체크리스트 | 롤백 절차서, 점검표 | 이전 버전 복구, 실패 원인 정리 |
+| | 11:30~12:30 | 모듈 3 | 버전관리와 이미지 태그 수동 반영 | 변경된 배포 매니페스트 | GHCR 이미지 태그 확인, 매니페스트 수정, commit/push |
+| | 13:30~15:00 | 모듈 4 | Argo CD 설치 및 앱 등록 | Argo CD 애플리케이션 | 로컬 Kubernetes와 Git 저장소 연결 |
+| | 15:00~16:30 | 모듈 5 | 선언형 CD와 동기화 실습 | Sync/OutOfSync 확인 결과 | 수동 Sync, 상태 점검, 자동 Sync 선택 확인 |
+| | 16:30~18:00 | 모듈 6 | 롤백과 운영 체크리스트 | 롤백 절차서, 점검표 | 잘못된 이미지 태그 장애 재현과 복구 |
 
 ---
 
@@ -163,12 +186,12 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 
 | 모듈 | 시간 | 내용 |
 |---|---|---|
-| **모듈 1** Docker Desktop 실습 환경 준비 | 09:00~10:00 | Docker Desktop 설치, Docker Engine 상태 확인, Compose 사용 가능 여부, 실습에 필요한 CPU/메모리 설정을 점검한다. 이 단계는 이후 실습 실패를 줄이기 위한 준비 단계로 설계한다. |
-| **모듈 2** Docker 기본 개념과 컨테이너 실행 | 10:00~11:30 | 이미지와 컨테이너의 차이, 실행 환경 분리, 포트 매핑과 볼륨 개념을 짧게 설명한 뒤 바로 단일 컨테이너 실행으로 연결한다. 개념 설명은 최소화하고 명령 실행 결과를 통해 동작 원리를 체감하게 한다. |
-| **모듈 3** Spring 애플리케이션 컨테이너화 | 11:30~13:00 | Spring Boot 예제 애플리케이션을 대상으로 JAR 빌드와 Dockerfile 작성, 이미지 빌드와 실행 흐름을 학습한다. 목표는 "애플리케이션이 이미지가 되고 컨테이너로 실행된다"는 흐름을 확실히 잡는 것이다. |
-| **모듈 4** Docker Compose 기반 Spring + PostgreSQL 연동 | 14:00~16:00 | Spring 애플리케이션과 PostgreSQL을 각각 컨테이너로 구성하고, Compose를 통해 함께 기동한다. 환경변수와 설정 파일을 분리해 개발 환경과 실행 환경 간 차이를 이해하게 한다. |
-| **모듈 5** Kubernetes 개요와 로컬 준비 | 16:00~17:00 | Docker Desktop에서 Kubernetes를 활성화하고 `kubectl` 명령으로 노드와 시스템 Pod를 확인한다. Kubernetes 리소스 실습은 2일차 이후로 넘기되, 1일차에는 로컬 클러스터 준비 상태를 확보하는 데 집중한다. |
-| **모듈 6** 운영 관점 점검과 2일차 연결 | 17:00~18:00 | 컨테이너 기동 실패, 포트 충돌, DB 연결 오류, 환경변수 누락 등 초반에 자주 발생하는 오류를 점검한다. 이를 통해 2일차의 쿠버네티스 배포와 운영 오류 대응 실습으로 자연스럽게 연결한다. |
+| **모듈 1** 사전 설치 점검 + Docker Desktop/WSL2 복구 | 09:00~10:30 | Docker Desktop, WSL2, Git, PowerShell 상태를 점검하고 실습 가능 환경으로 복구한다. 이 단계는 이후 실습 실패를 줄이기 위한 준비 단계로 설계한다. |
+| **모듈 2** Docker 기본 개념과 컨테이너 실행 | 10:30~11:30 | 이미지와 컨테이너의 차이, 실행 환경 분리, 포트 매핑과 볼륨 개념을 짧게 설명한 뒤 바로 단일 컨테이너 실행으로 연결한다. 개념 설명은 최소화하고 명령 실행 결과를 통해 동작 원리를 체감하게 한다. |
+| **모듈 3** Spring 애플리케이션 컨테이너화 | 11:30~12:30 | Spring Boot 예제 애플리케이션을 대상으로 JAR 빌드와 Dockerfile 작성, 이미지 빌드와 실행 흐름을 학습한다. 목표는 "애플리케이션이 이미지가 되고 컨테이너로 실행된다"는 흐름을 확실히 잡는 것이다. |
+| **모듈 4** Docker Compose 기반 Spring + PostgreSQL 연동 | 13:30~15:30 | Spring 애플리케이션과 PostgreSQL을 각각 컨테이너로 구성하고, Compose를 통해 함께 기동한다. 환경변수와 설정 파일을 분리해 개발 환경과 실행 환경 간 차이를 이해하게 한다. |
+| **모듈 5** Kubernetes 개요와 로컬 준비 | 15:30~16:30 | Docker Desktop에서 Kubernetes를 활성화하고 `kubectl` 명령으로 노드와 시스템 Pod를 확인한다. Kubernetes 리소스 실습은 2일차 이후로 넘기되, 1일차에는 로컬 클러스터 준비 상태를 확보하는 데 집중한다. |
+| **모듈 6** 운영 관점 점검과 2일차 연결 | 16:30~18:00 | 컨테이너 기동 실패, 포트 충돌, DB 연결 오류, 환경변수 누락 등 초반에 자주 발생하는 오류를 점검한다. 이를 통해 2일차의 쿠버네티스 배포와 운영 오류 대응 실습으로 자연스럽게 연결한다. |
 
 ### 실습 시나리오
 
@@ -189,7 +212,7 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 ### 1일차 준비물
 
 - Docker Desktop
-- Visual Studio Code 또는 IntelliJ IDEA
+- Antigravity IDE 권장 (VS Code 또는 IntelliJ IDEA 대체 가능)
 - 예제 Spring Boot 프로젝트 (제공)
 - kubectl
 
@@ -246,7 +269,7 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 - Docker Desktop Kubernetes 활성화 완료 환경
 - 1일차에 사용한 Spring Boot 이미지 또는 예제 프로젝트
 - PostgreSQL용 기본 매니페스트 (제공)
-- Visual Studio Code
+- Antigravity IDE 권장 (VS Code 또는 IntelliJ IDEA 대체 가능)
 - kubectl
 - 실습용 namespace 및 YAML 파일 템플릿 (제공)
 
@@ -266,11 +289,14 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 ### 학습목표
 
 - GitHub Actions로 빌드와 테스트를 자동화할 수 있다.
-- Docker 이미지 버전을 태깅하고, 배포 저장소 또는 매니페스트를 갱신하는 CI 흐름을 구성할 수 있다.
+- Docker 이미지 버전을 확인하고, 배포 매니페스트에 수동으로 반영하는 GitOps 기본 흐름을 수행할 수 있다.
 - Argo CD로 로컬 Kubernetes 클러스터에 선언형 배포를 적용할 수 있다.
 - 배포 상태를 확인하고 롤백 또는 재동기화로 복구할 수 있다.
 
 ### GitOps 전체 흐름
+
+> 3일차 Argo CD 실습은 2일차에서 만든 `todo-app` 네임스페이스와 `Service`, `ConfigMap`, `Secret`, PostgreSQL 리소스가 클러스터에 남아 있다는 전제로 진행한다.
+> `day3/k8s`는 GitOps로 변경·동기화할 애플리케이션 Deployment만 관리하며, 2일차 기반 리소스(`todo-app` Service, `postgres` Service/Deployment/PVC, `app-config`, `db-secret`)를 다시 생성하지 않는다.
 
 ```
 코드 push (GitHub main 브랜치)
@@ -279,13 +305,16 @@ Kubernetes 활성화 준비          → 3일차 매니페스트 확보         
 GitHub Actions (CI)
   ├─ 1. Gradle 빌드 & 테스트
   ├─ 2. Docker 이미지 빌드
-  └─ 3. GHCR push (태그: 커밋SHA / latest)
+  └─ 3. GHCR push (태그: 7자리 short SHA / latest)
                 │
                 ▼
-  배포 매니페스트(day3/k8s/) 이미지 태그 갱신
+  수강생이 GHCR 이미지 태그 확인
                 │
                 ▼
-  Git commit & push (배포 저장소)
+  day3/k8s/app-deployment.yml 이미지 태그 수동 변경
+                │
+                ▼
+  Git commit & push
                 │
                 ▼
   Argo CD OutOfSync 감지
@@ -303,7 +332,7 @@ GitHub Actions (CI)
 |---|---|---|
 | **모듈 1** CI/CD 구조와 GitOps 이해 | 09:00~10:00 | 개발·검증·운영 환경 간 변경 관리 흐름과 GitOps의 핵심 개념을 도식으로 정리한다. 이론 위주보다는 "우리가 수동으로 하던 배포를 어떻게 자동화하는가"의 큰 그림을 먼저 보여준다. |
 | **모듈 2** GitHub Actions CI 구성 | 10:00~11:30 | Spring Boot 코드가 push되었을 때 GitHub Actions가 트리거되어 빌드·테스트를 수행하고 GHCR에 이미지를 push하는 workflow를 작성한다. |
-| **모듈 3** 버전관리와 이미지 태깅 | 11:30~13:00 | 빌드된 이미지에 커밋 SHA 또는 버전 태그를 부여하고, 이를 Git 배포 저장소의 매니페스트에 반영하여 버전 추적이 가능하도록 설계한다. |
+| **모듈 3** 버전관리와 이미지 태깅 | 11:30~13:00 | GHCR에 생성된 이미지 태그를 확인하고, 수강생이 직접 배포 매니페스트의 이미지 태그를 변경하여 버전 추적 흐름을 이해한다. |
 | **모듈 4** Argo CD 설치 및 앱 등록 | 14:00~15:30 | 로컬 Kubernetes 환경에 Argo CD를 구축하고, Git 배포 저장소를 Argo CD에 등록하여 쿠버네티스 상태와 Git의 동기화를 준비한다. |
 | **모듈 5** 선언형 CD와 동기화 실습 | 15:30~17:00 | Git의 매니페스트 수정이 Argo CD를 거쳐 로컬 쿠버네티스 클러스터로 배포되는 과정을 확인하고 Sync/OutOfSync 상태 변화를 추적한다. |
 | **모듈 6** 롤백과 운영 체크리스트 | 17:00~18:00 | 배포가 실패하거나 오동작할 때 Argo CD 롤백 기능이나 Git revert를 통해 이전 안정화 버전으로 즉각 복구하는 시나리오를 실습한다. |
@@ -313,7 +342,7 @@ GitHub Actions (CI)
 | 실습 | 목표 | 체크포인트 | 성공 조건 |
 |---|---|---|---|
 | **실습 1** GitHub Actions CI 파이프라인 구성 | 코드 변경 시 테스트와 빌드가 자동 실행되도록 workflow 작성 | push 또는 PR 발생 시 job이 실행되고, 테스트와 빌드가 성공 | Docker 이미지가 생성되며 레지스트리(GHCR) 반영 완료 |
-| **실습 2** 버전 태깅과 배포 기준 정리 | 커밋 SHA 또는 버전 태그 기준으로 이미지와 매니페스트 관리 | 버전 규칙 문서 작성, 이미지 태그 확인, 배포 이력 추적 가능 | 어떤 커밋이 어떤 배포 버전인지 역추적할 수 있다 |
+| **실습 2** 이미지 태그 수동 반영 | GHCR 이미지 태그를 확인하고 배포 매니페스트에 직접 반영 | 이미지 태그 확인, `day3/k8s/app-deployment.yml` 수정, commit/push | 어떤 이미지 태그가 어떤 Git commit으로 배포됐는지 역추적할 수 있다 |
 | **실습 3** Argo CD 설치와 애플리케이션 등록 | 로컬 Kubernetes에 Argo CD를 설치하고 애플리케이션 등록 | Argo CD UI/CLI 접근, 앱 등록, Sync 상태 확인 | Git 저장소의 매니페스트가 클러스터 대상 앱으로 연결된다 |
 | **실습 4** 선언형 배포와 동기화 확인 | Git 저장소의 변경이 클러스터에 반영되는 흐름 확인 | 매니페스트 수정, Sync 실행, Pod/Service 상태 확인 | Argo CD에서 동기화 성공 상태를 확인하고 애플리케이션이 정상 응답 |
 | **실습 5** 롤백 및 복구 | 잘못된 버전이나 설정을 되돌리고 서비스 정상 상태 복구 | 이전 revision 선택, rollback 또는 재동기화 수행, 정상 상태 확인 | 이전 정상 버전으로 서비스가 복구된다 |
@@ -351,8 +380,7 @@ argocd app create todo-app `
   --repo https://github.com/[계정명]/docker_k8s_tutorial.git `
   --path day3/k8s `
   --dest-server https://kubernetes.default.svc `
-  --dest-namespace todo-app `
-  --sync-policy automated
+  --dest-namespace todo-app
 ```
 
 ### Argo CD 동기화 상태 설명
@@ -377,6 +405,7 @@ argocd app create todo-app `
 - Docker Desktop Kubernetes 활성화 완료 환경
 - GitHub 저장소 (앱 소스 + 배포 매니페스트)
 - GitHub Actions Workflow 파일 (제공)
+- 수강생 개인 GitHub fork 저장소
 - Argo CD 설치 YAML 또는 manifest
 - kubectl, argocd CLI (선택)
 - 1일차/2일차에서 사용한 Spring Boot + PostgreSQL 예제
@@ -394,7 +423,7 @@ argocd app create todo-app `
 
 ### Todo CRUD REST API
 
-> Spring Boot 3.2 + PostgreSQL 16 기반의 Todo 목록 API.  
+> Spring Boot 3.2 + PostgreSQL 16 기반의 Todo 목록 API.
 > 동일한 이미지에서 환경변수만 교체해 로컬·Compose·Kubernetes·GitOps 환경 모두 동작한다.
 
 #### API 엔드포인트
@@ -459,8 +488,10 @@ docker_k8s_tutorial/
 ├── day3/                              ← 3일차 실습 파일
 │   ├── README.md                      ← 실습 가이드 (GitOps 흐름 포함)
 │   └── k8s/
-│       ├── app-deployment.yml         ← CI가 이미지 태그 갱신하는 대상
-│       └── kustomization.yml
+│       ├── app-deployment.yml         ← 수강생이 GHCR short SHA 이미지 태그를 수동 반영하는 대상
+│       └── kustomization.yml          ← Argo CD가 day3/k8s를 읽는 진입점
+│
+│   ※ day3/k8s는 app Deployment만 포함한다. Service/ConfigMap/Secret/PostgreSQL은 day2 실습 결과를 전제로 한다.
 │
 └── .github/
     └── workflows/

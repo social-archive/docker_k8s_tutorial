@@ -1,10 +1,14 @@
 # 모듈 6 — 운영 관점 문제 진단 입문
 
-> **목표**: 자주 발생하는 배포 오류를 간단히 재현하고  
-> `describe`, `logs`, `rollout` 명령으로 원인을 찾는 흐름을 익힌다.  
+> **목표**: 자주 발생하는 배포 오류를 간단히 재현하고
+> `describe`, `logs`, `rollout` 명령으로 원인을 찾는 흐름을 익힌다.
 > 3일차 GitOps 롤백 실습으로의 연결 고리를 확인한다.
 
 ---
+
+> 모든 명령은 Windows PowerShell 기준입니다.
+> 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
+> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 6-1. 대표적인 배포 오류 유형
 
@@ -12,7 +16,7 @@
 |---|---|---|
 | Pod가 `Pending` | 리소스 부족, PVC 미생성 | `kubectl describe pod` |
 | Pod가 `CrashLoopBackOff` | 앱 기동 실패, 환경변수 오류 | `kubectl logs` |
-| Pod가 `ImagePullBackOff` | 이미지 없음, 태그 오류 | `kubectl describe pod` |
+| Pod가 `ImagePullBackOff`/`ErrImageNeverPull` | 이미지 없음, 태그 오류, 로컬 이미지 정책 | `kubectl describe pod` |
 | 앱은 뜨는데 DB 연결 실패 | 서비스 셀렉터 불일치, Secret 오류 | `kubectl describe svc` |
 
 ---
@@ -21,28 +25,28 @@
 
 ```powershell
 # 존재하지 않는 이미지 태그로 배포 (오류 유도)
-kubectl set image deployment/todo-app todo-app=todo-app:9.9 -n todo
+kubectl set image deployment/todo-app todo-app=todo-app:9.9 -n todo-app
 
-# Pod 상태 확인 → ImagePullBackOff 발생
-kubectl get pods -n todo -w
+# Pod 상태 확인 → ImagePullBackOff 또는 ErrImageNeverPull 발생
+kubectl get pods -n todo-app -w
 ```
 
 **원인 진단**
 
 ```powershell
-kubectl describe pod -l app=todo-app -n todo
+kubectl describe pod -l app=todo-app -n todo-app
 ```
 
-이벤트 섹션에서 `Failed to pull image` 메시지 확인.
+이벤트 섹션에서 이미지 태그 오류 또는 로컬 이미지 없음 메시지를 확인한다.
 
 **복구**
 
 ```powershell
 # 정상 태그로 롤백
-kubectl rollout undo deployment/todo-app -n todo
+kubectl rollout undo deployment/todo-app -n todo-app
 
 # 롤백 상태 확인
-kubectl rollout status deployment/todo-app -n todo
+kubectl rollout status deployment/todo-app -n todo-app
 ```
 
 ---
@@ -51,20 +55,21 @@ kubectl rollout status deployment/todo-app -n todo
 
 ```powershell
 # ConfigMap 삭제 (환경변수 누락 시뮬레이션)
-kubectl delete configmap app-config -n todo
+kubectl delete configmap app-config -n todo-app
 
 # Deployment 재시작
-kubectl rollout restart deployment/todo-app -n todo
+kubectl rollout restart deployment/todo-app -n todo-app
 
-# 로그 확인 → DB 연결 오류 발생
-kubectl logs -l app=todo-app -n todo
+# Pod 상태/이벤트 확인 → ConfigMap not found 계열 오류 확인
+kubectl get pods -n todo-app
+kubectl describe pod -l app=todo-app -n todo-app
 ```
 
 **복구**
 
 ```powershell
-kubectl apply -f k8s/app-configmap.yml -n todo
-kubectl rollout restart deployment/todo-app -n todo
+kubectl apply -f k8s/app-configmap.yml -n todo-app
+kubectl rollout restart deployment/todo-app -n todo-app
 ```
 
 ---
@@ -85,13 +90,13 @@ k9s
 
 ```powershell
 # 배포 이력 확인
-kubectl rollout history deployment/todo-app -n todo
+kubectl rollout history deployment/todo-app -n todo-app
 
 # 특정 버전으로 롤백
-kubectl rollout undo deployment/todo-app --to-revision=1 -n todo
+kubectl rollout undo deployment/todo-app --to-revision=1 -n todo-app
 
 # 현재 상태 확인
-kubectl rollout status deployment/todo-app -n todo
+kubectl rollout status deployment/todo-app -n todo-app
 ```
 
 ---
@@ -100,7 +105,7 @@ kubectl rollout status deployment/todo-app -n todo
 
 | 항목 | 확인 |
 |---|:---:|
-| `todo` 네임스페이스가 생성되었다 | ☐ |
+| `todo-app` 네임스페이스가 생성되었다 | ☐ |
 | PostgreSQL Pod가 `Running` 상태다 | ☐ |
 | Spring 앱 Pod가 `Running` 상태다 | ☐ |
 | ConfigMap과 Secret이 적용되었다 | ☐ |
@@ -113,15 +118,15 @@ kubectl rollout status deployment/todo-app -n todo
 
 | 2일차 산출물 | 3일차 활용 |
 |---|---|
-| `day2/k8s/` 매니페스트 구조 | Argo CD가 이 구조를 Git에서 동기화 |
+| `day3/k8s/` 매니페스트 구조 | Argo CD가 Git에서 앱 Deployment를 동기화 |
 | `kubectl rollout undo` 경험 | Argo CD 롤백으로 확장 |
-| ConfigMap/Secret 분리 구조 | GitOps에서 설정 변경 → 자동 반영 |
+| ConfigMap/Secret 분리 구조 | 3일차 Deployment가 기존 설정 리소스를 참조 |
 
 ---
 
 ## ✅ 모듈 6 완료 기준
 
-- [ ] `ImagePullBackOff` 오류를 재현하고 `rollout undo`로 복구했다
+- [ ] `ImagePullBackOff` 또는 `ErrImageNeverPull` 오류를 재현하고 `rollout undo`로 복구했다
 - [ ] 배포 이력(`rollout history`)을 확인했다
 - [ ] 3일차 실습에 필요한 매니페스트 구조가 확보되었다
 

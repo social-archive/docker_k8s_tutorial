@@ -19,7 +19,7 @@
 | 모듈 2 | PostgreSQL 쿠버네티스 배포 | DB Deployment, Service, PVC | DB 기동 및 내부 접근 확인 |
 | 모듈 3 | Spring 애플리케이션 배포 | App Deployment, Service | 애플리케이션 Pod 기동 |
 | 모듈 4 | ConfigMap, Secret 기반 설정 분리 | 설정 분리형 매니페스트 | DB 접속 정보 주입 실습 |
-| 모듈 5 | 통합 검증과 서비스 확인 | 앱-DB 연동 결과 | API 호출, 로그 확인, k9s로 상태 점검 |
+| 모듈 5 | 통합 검증과 서비스 확인 | 앱-DB 연동 결과 | API 호출, 로그 확인, kubectl 또는 k9s로 상태 점검 |
 | 모듈 6 | 운영 관점 문제 진단 입문 | 장애 원인 분석 메모 | describe, logs, rollout 상태 확인 |
 
 ## 상세 내용
@@ -36,7 +36,7 @@ PostgreSQL을 Deployment와 Service로 구성하고, 필요 시 PersistentVolume
 애플리케이션 설정과 민감정보를 코드 또는 이미지에 넣지 않고 외부화하는 방법을 학습한다. 과정안의 “환경변수와 설정 파일을 분리하여 개발 환경과 검증 환경 간 차이를 조정”하는 방향을 실제 매니페스트로 구현하는 단계다.
 
 ### 모듈 5. 통합 검증과 서비스 확인
-배포가 끝난 뒤 `kubectl get`, `describe`, `logs`, 포트 포워딩 또는 서비스 접근을 통해 애플리케이션과 PostgreSQL의 연결 상태를 검증한다. k9s를 활용해 Pod 상태와 로그를 실시간으로 모니터링하며, "배포 성공 = Pod Running"이 아니라 "서비스 응답까지 확인"이라는 운영 관점을 강조한다.
+배포가 끝난 뒤 `kubectl get`, `describe`, `logs`, 포트 포워딩 또는 서비스 접근을 통해 애플리케이션과 PostgreSQL의 연결 상태를 검증한다. kubectl을 기본으로 사용하고 k9s가 가능하면 Pod 상태와 로그를 실시간으로 모니터링하며, "배포 성공 = Pod Running"이 아니라 "서비스 응답까지 확인"이라는 운영 관점을 강조한다.
 
 ### 모듈 6. 운영 관점 문제 진단 입문
 이미지 태그 오류, 환경변수 누락, 서비스 셀렉터 불일치 등 자주 발생하는 문제를 간단히 재현한다. 이를 통해 3일차의 배포 오류 대응, 롤백, 운영 체크리스트 실습으로 자연스럽게 넘어가도록 설계한다.
@@ -79,7 +79,7 @@ PostgreSQL을 Deployment와 Service로 구성하고, 필요 시 PersistentVolume
 - PostgreSQL용 기본 매니페스트
 - **Antigravity IDE** (코드 및 YAML 편집)
 - kubectl
-- k9s
+- k9s (선택/권장)
 - 실습용 namespace 및 YAML 파일 템플릿
 
 ## 2일차 완료 기준

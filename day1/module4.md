@@ -1,11 +1,15 @@
 # 모듈 4 — Docker Compose 기반 Spring + PostgreSQL 연동
 
-> **목표**: Spring 애플리케이션과 PostgreSQL을 각각 컨테이너로 구성하고  
+> **목표**: Spring 애플리케이션과 PostgreSQL을 각각 컨테이너로 구성하고
 > Compose를 통해 함께 기동한다. 환경변수 분리와 서비스 의존성 설정을 이해한다.
 
 ---
 
-## 4-1. Antigravity IDE에서 관련 파일 열기
+> 모든 명령은 Windows PowerShell 기준입니다.
+> 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
+> 실행 위치는 저장소 루트에서 `cd day1`로 이동한 `day1/` 디렉터리 기준입니다.
+
+## 4-1. Antigravity IDE 또는 사용 중인 IDE에서 관련 파일 열기
 
 1. `day1/compose.yml` 클릭 — 서비스 구성 확인
 2. `day1/.env` 클릭 — 환경변수 확인
@@ -43,14 +47,14 @@ DB_USER=todo
 DB_PASSWORD=todo1234
 ```
 
-> 💡 `DB_HOST=postgres`는 같은 Compose 네트워크 안에서  
+> 💡 `DB_HOST=postgres`는 같은 Compose 네트워크 안에서
 > 서비스 이름(`postgres`)을 호스트명으로 사용하기 때문이다.
 
 ---
 
 ## 4-3. compose.yml 구조 이해
 
-Antigravity IDE에서 `day1/compose.yml`을 열어 구조를 확인한다.
+Antigravity IDE 또는 사용 중인 IDE에서 `day1/compose.yml`을 열어 구조를 확인한다.
 
 핵심 포인트:
 
@@ -117,18 +121,18 @@ docker compose logs -f app
 
 ```powershell
 # 할 일 목록 조회 (빈 배열 [] 이 정상)
-curl http://localhost:8080/todos
+curl.exe http://localhost:8080/todos
 
 # 할 일 추가
-curl -X POST http://localhost:8080/todos `
+curl.exe -X POST http://localhost:8080/todos `
   -H "Content-Type: application/json" `
   -d '{"title":"Docker 실습 완료"}'
 
 # 다시 목록 조회 (추가된 항목 확인)
-curl http://localhost:8080/todos
+curl.exe http://localhost:8080/todos
 
 # 헬스체크
-curl http://localhost:8080/actuator/health
+curl.exe http://localhost:8080/actuator/health
 ```
 
 **정상 응답 예시**

@@ -1,13 +1,17 @@
 # 모듈 3 — Spring 애플리케이션 배포
 
-> **목표**: 1일차에 만든 `todo-app:1.0` 이미지를 기반으로  
+> **목표**: 1일차에 만든 `todo-app:1.0` 이미지를 기반으로
 > Spring Boot 애플리케이션을 Deployment로 배포하고 Service로 노출한다.
 
 ---
 
+> 모든 명령은 Windows PowerShell 기준입니다.
+> 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
+> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
+
 ## 3-1. 관련 파일 열기
 
-Antigravity IDE에서 `day2/k8s/` 디렉토리의 아래 파일들을 확인한다.
+Antigravity IDE 또는 사용 중인 IDE에서 `day2/k8s/` 디렉토리의 아래 파일들을 확인한다.
 
 ```
 day2/k8s/
@@ -34,13 +38,28 @@ cd ..\day2
 
 ---
 
-## 3-3. Spring 앱 Deployment 배포
+
+## 3-3. 앱 ConfigMap 먼저 적용
+
+Spring 앱 Deployment는 `app-config` ConfigMap에서 DB 접속 정보를 읽는다.
+따라서 앱 Deployment를 만들기 전에 ConfigMap을 먼저 생성해야 한다.
 
 ```powershell
-kubectl apply -f k8s/app-deployment.yml -n todo
+kubectl apply -f k8s/app-configmap.yml -n todo-app
+
+# 생성 확인
+kubectl get configmap app-config -n todo-app
+```
+
+---
+
+## 3-4. Spring 앱 Deployment 배포
+
+```powershell
+kubectl apply -f k8s/app-deployment.yml -n todo-app
 
 # Pod 기동 상태 확인
-kubectl get pods -n todo -w
+kubectl get pods -n todo-app -w
 ```
 
 **정상 출력**
@@ -55,14 +74,14 @@ postgres-xxx-xxx       1/1     Running   0
 
 ---
 
-## 3-4. Spring 앱 로그 확인
+## 3-5. Spring 앱 로그 확인
 
 ```powershell
 # 앱 로그 확인
-kubectl logs -l app=todo-app -n todo
+kubectl logs -l app=todo-app -n todo-app
 
 # 실시간 로그 팔로우
-kubectl logs -l app=todo-app -n todo -f
+kubectl logs -l app=todo-app -n todo-app -f
 ```
 
 **정상 기동 로그 예시**
@@ -71,19 +90,19 @@ kubectl logs -l app=todo-app -n todo -f
 Started TodoApplication in 3.x seconds
 ```
 
-**k9s로 확인**
+**k9s로 확인 (권장)**
 
 `:pod` → `todo-app` Pod 선택 → `l`
 
 ---
 
-## 3-5. Service 생성 및 접근 확인
+## 3-6. Service 생성 및 접근 확인
 
 ```powershell
-kubectl apply -f k8s/app-service.yml -n todo
+kubectl apply -f k8s/app-service.yml -n todo-app
 
 # 서비스 확인
-kubectl get services -n todo
+kubectl get services -n todo-app
 ```
 
 **정상 출력**
@@ -98,23 +117,23 @@ todo-app   NodePort    10.x.x.x      <none>        8080:30080/TCP   10s
 
 ---
 
-## 3-6. API 동작 확인
+## 3-7. API 동작 확인
 
 ```powershell
 # 할 일 목록 조회
-curl http://localhost:30080/todos
+curl.exe http://localhost:30080/todos
 
 # 헬스체크
-curl http://localhost:30080/actuator/health
+curl.exe http://localhost:30080/actuator/health
 ```
 
 ---
 
-## 3-7. Deployment 구조 이해
+## 3-8. Deployment 구조 이해
 
 ```powershell
 # Deployment 상세 정보
-kubectl describe deployment todo-app -n todo
+kubectl describe deployment todo-app -n todo-app
 ```
 
 핵심 확인 항목:
@@ -130,10 +149,11 @@ kubectl describe deployment todo-app -n todo
 
 ## ✅ 모듈 3 완료 기준
 
+- [ ] `app-config` ConfigMap이 생성되었다
 - [ ] Spring 앱 Pod가 `Running` 상태다
 - [ ] `http://localhost:30080/todos` API 응답이 정상이다
 - [ ] `kubectl logs`로 정상 기동 로그가 확인된다
-- [ ] k9s에서 todo-app Pod의 상태가 확인된다
+- [ ] kubectl 또는 k9s로 todo-app Pod의 상태가 확인된다
 
 ---
 

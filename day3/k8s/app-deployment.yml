@@ -18,10 +18,10 @@ spec:
       containers:
         - name: todo-app
           # ---------------------------------------------------------------
-          # CI가 완료되면 이 image 태그를 자동으로 갱신한다.
-          # 형식: ghcr.io/[계정명]/todo-app:[커밋SHA]
+          # GitHub Actions가 GHCR에 push한 이미지 태그를 수강생이 수동 반영한다.
+          # 형식: ghcr.io/<GitHub-username>/todo-app:<7자리-short-sha>
           # ---------------------------------------------------------------
-          image: ghcr.io/YOUR_GITHUB_USERNAME/todo-app:latest
+          image: ghcr.io/YOUR_GITHUB_USERNAME/todo-app:replace-with-short-sha
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

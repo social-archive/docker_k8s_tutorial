@@ -1,9 +1,13 @@
 # 모듈 1 — Kubernetes 기본 구조 이해
 
-> **목표**: "현재 클러스터에 무엇이 떠 있는가"를 확인하는 관찰 중심으로 운영한다.  
+> **목표**: "현재 클러스터에 무엇이 떠 있는가"를 확인하는 관찰 중심으로 운영한다.
 > 이론 나열보다 실제 리소스 조회 명령으로 Kubernetes 구조를 체감한다.
 
 ---
+
+> 모든 명령은 Windows PowerShell 기준입니다.
+> 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
+> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 1-1. 클러스터 상태 점검
 
@@ -50,20 +54,20 @@ kubectl apply -f k8s/namespace.yml
 kubectl get namespaces
 ```
 
-**namespace.yml 내용 확인** (Antigravity IDE에서 `day2/k8s/namespace.yml` 열기)
+**namespace.yml 내용 확인** (Antigravity IDE 또는 사용 중인 IDE에서 `day2/k8s/namespace.yml` 열기)
 
 ```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: todo
+  name: todo-app
 ```
 
-이후 모든 실습은 `todo` 네임스페이스에서 진행한다.
+이후 모든 실습은 `todo-app` 네임스페이스에서 진행한다.
 
 ```powershell
-# 기본 네임스페이스를 todo로 설정 (선택)
-kubectl config set-context --current --namespace=todo
+# 기본 네임스페이스를 todo-app으로 설정 (선택)
+kubectl config set-context --current --namespace=todo-app
 ```
 
 ---
@@ -72,7 +76,7 @@ kubectl config set-context --current --namespace=todo
 
 | 리소스 | 역할 | 이번 실습 활용 |
 |---|---|---|
-| **Namespace** | 리소스 격리 단위 | `todo` 네임스페이스 |
+| **Namespace** | 리소스 격리 단위 | `todo-app` 네임스페이스 |
 | **Pod** | 컨테이너 실행 단위 | Spring / PostgreSQL |
 | **Deployment** | Pod 생명주기 관리 | 앱·DB 배포 |
 | **Service** | Pod 네트워크 노출 | ClusterIP / NodePort |
@@ -85,8 +89,8 @@ kubectl config set-context --current --namespace=todo
 ## ✅ 모듈 1 완료 기준
 
 - [ ] `kubectl get nodes`에서 `docker-desktop`이 `Ready` 상태다
-- [ ] `todo` 네임스페이스가 생성되었다
-- [ ] k9s에서 클러스터 전체 Pod 상태가 확인된다
+- [ ] `todo-app` 네임스페이스가 생성되었다
+- [ ] k9s 또는 kubectl로 클러스터 전체 Pod 상태가 확인된다
 
 ---
 

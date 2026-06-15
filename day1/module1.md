@@ -1,28 +1,33 @@
 # 모듈 1 — Docker Desktop 실습 환경 준비
 
-> **목표**: 이후 실습 실패를 줄이기 위한 준비 단계.  
+> **목표**: 이후 실습 실패를 줄이기 위한 준비 단계.
 > Docker Desktop 설치 상태, Docker Engine 동작 여부, Compose 플러그인을 모두 확인한다.
 
 ---
 
-## 1-1. Antigravity IDE에서 터미널 열기
+> 모든 명령은 Windows PowerShell 기준입니다.
+> 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
+> 실행 위치는 저장소 루트에서 `cd day1`로 이동한 `day1/` 디렉터리 기준입니다.
 
-1. **Antigravity IDE** 왼쪽 사이드바 하단 **터미널 아이콘** 클릭  
-   또는 단축키 `` Ctrl+` ``
-2. PowerShell 프롬프트가 열리면 준비 완료
+## 1-1. IDE에서 PowerShell 터미널 열기
+
+1. 권장: **Antigravity IDE**에서 터미널을 연다.
+   VS Code 또는 IntelliJ IDEA를 사용해도 된다.
+2. 터미널 종류가 **PowerShell**인지 확인한다.
+3. PowerShell 프롬프트가 열리면 준비 완료
 
 ---
 
 ## 1-2. WSL2 활성화 확인
 
-Docker Desktop on Windows는 **WSL2(윈도우 Linux 서브시스템)**를 기반으로 동작한다.  
+Docker Desktop on Windows는 **WSL2(윈도우 Linux 서브시스템)**를 기반으로 동작한다.
 WSL2가 비활성화 상태면 Docker가 실행되지 않으므로 반드시 사전 확인이 필요하다.
 
 ```powershell
 # WSL2 설치 상태 확인
 wsl --status
 
-# 설치된 Linux 배포판 목록 (콜스팅 전 미리 설치해 두면 좋음)
+# 설치된 Linux 배포판 목록 (강의 전 미리 설치해 두면 좋음)
 wsl --list --verbose
 ```
 
@@ -62,7 +67,7 @@ Server: Docker Desktop
   Version:          26.x.x
 ```
 
-> ❌ `Cannot connect to the Docker daemon` 오류가 나오면  
+> ❌ `Cannot connect to the Docker daemon` 오류가 나오면
 > 트레이 아이콘에서 Docker Desktop이 실행 중인지 확인한다.
 
 ---

@@ -1,13 +1,17 @@
 # 모듈 3 — Spring 애플리케이션 컨테이너화
 
-> **목표**: Spring Boot 예제 앱을 Docker 이미지로 빌드하고 실행하는 흐름을 경험한다.  
+> **목표**: Spring Boot 예제 앱을 Docker 이미지로 빌드하고 실행하는 흐름을 경험한다.
 > "애플리케이션이 이미지가 되고 컨테이너로 실행된다"는 흐름을 확실히 잡는다.
 
 ---
 
-## 3-1. Antigravity IDE에서 Dockerfile 열기
+> 모든 명령은 Windows PowerShell 기준입니다.
+> 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
+> 실행 위치는 저장소 루트에서 `cd day1`로 이동한 `day1/` 디렉터리 기준입니다.
 
-1. Antigravity IDE 왼쪽 탐색기에서 `spring-app/Dockerfile` 클릭
+## 3-1. Antigravity IDE 또는 사용 중인 IDE에서 Dockerfile 열기
+
+1. Antigravity IDE 또는 사용 중인 IDE의 탐색기에서 `spring-app/Dockerfile` 클릭
 2. 파일 구조를 살펴본다
 
 **Dockerfile 구조 요약**
@@ -22,7 +26,7 @@ FROM eclipse-temurin:17-jre-alpine
 # 빌드된 JAR만 복사해서 실행
 ```
 
-> 💡 **멀티스테이지 빌드**: JDK로 빌드하고 JRE만 담아 실행하므로  
+> 💡 **멀티스테이지 빌드**: JDK로 빌드하고 JRE만 담아 실행하므로
 > 최종 이미지 크기를 최소화할 수 있다.
 
 ---
@@ -39,7 +43,7 @@ cd ..\spring-app
 docker build -t todo-app:1.0 .
 ```
 
-> ⏳ 첫 빌드는 Gradle 의존성을 다운로드하므로 3~5분 정도 소요된다.  
+> ⏳ 첫 빌드는 Gradle 의존성을 다운로드하므로 3~5분 정도 소요된다.
 > 두 번째 빌드부터는 캐시를 활용해 빠르게 완료된다.
 
 ---
@@ -76,8 +80,8 @@ docker logs todo-test
 com.example.todo: Connection refused: localhost/127.0.0.1:5432
 ```
 
-> ✅ 이 오류는 **정상**이다.  
-> PostgreSQL 없이 Spring 앱만 단독 실행하면 DB 연결을 못 해 오류가 발생한다.  
+> ✅ 이 오류는 **정상**이다.
+> PostgreSQL 없이 Spring 앱만 단독 실행하면 DB 연결을 못 해 오류가 발생한다.
 > 다음 모듈에서 Compose로 함께 실행하면 해결된다.
 
 ```powershell
@@ -87,9 +91,9 @@ docker rm -f todo-test
 
 ---
 
-## 3-5. Antigravity IDE에서 Dockerfile 분석 (선택)
+## 3-5. IDE에서 Dockerfile 분석 (선택)
 
-Antigravity IDE 에서 `spring-app/Dockerfile`을 열고 AI 채팅에 아래와 같이 질문해볼 수 있다.
+Antigravity IDE에서 `spring-app/Dockerfile`을 열고 AI 채팅에 아래와 같이 질문해볼 수 있다. 다른 IDE를 사용하는 경우 동일 파일을 직접 열어 구조를 확인한다.
 
 ```
 이 Dockerfile의 멀티스테이지 빌드 구조를 설명해줘
