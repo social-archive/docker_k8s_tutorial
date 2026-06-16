@@ -28,14 +28,14 @@ kubectl get svc postgres -n todo-app
 
 ## 6-2. Helm values 변경 → Argo CD OutOfSync 확인
 
-Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s/helm/values.yaml`을 열어 replica 수를 변경한다.
+Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s-day3-gitops/helm/values.yaml`을 열어 replica 수를 변경한다.
 
 ```yaml
 replicaCount: 3
 ```
 
 ```powershell
-git add day3/k8s/helm/values.yaml
+git add day3/k8s-day3-gitops/helm/values.yaml
 git commit -m "scale: increase replicas to 3"
 git push origin main
 ```
@@ -79,7 +79,7 @@ image:
 ```
 
 ```powershell
-git add day3/k8s/helm/values.yaml
+git add day3/k8s-day3-gitops/helm/values.yaml
 git commit -m "bug: wrong helm image tag (intentional)"
 git push origin main
 ```

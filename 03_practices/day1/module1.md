@@ -62,13 +62,18 @@ Antigravity IDE 또는 사용 중인 IDE의 파일 탐색기에서 아래 구조
 ```
 docker_k8s_tutorial/
 ├── .github/workflows/    ← GitHub Actions CI workflow (3일차)
-├── day1/                 ← 1일차 실습 파일
-│   ├── compose.yml       ← Docker Compose 설정
-│   └── .env              ← 환경변수
-├── day2/k8s/             ← Kubernetes 매니페스트 (2일차)
-├── day3/k8s/             ← GitOps 매니페스트 (3일차)
-└── spring-app/           ← Spring Boot 예제 애플리케이션
-    └── Dockerfile
+├── 01_design/            ← 과정 기획 및 설계 가이드
+├── 02_lectures/          ← 이론 강의 자료
+└── 03_practices/         ← 실습 자료 모음
+    ├── day1/             ← 1일차 가이드 문서
+    ├── day2/             ← 2일차 가이드 문서
+    ├── day3/             ← 3일차 가이드 문서
+    └── workspace/        ← 통합 실습 작업 공간
+        ├── spring-app/   ← Spring Boot 예제 소스 (Dockerfile 포함)
+        ├── compose.yml   ← Docker Compose 설정
+        ├── .env          ← 환경변수
+        ├── k8s-day2/     ← Kubernetes 매니페스트 (2일차)
+        └── k8s-day3-gitops/ ← GitOps 매니페스트 및 Helm (3일차)
 ```
 
 > 💡 코드를 작성할 일은 많지 않다. 주어진 파일을 이해하고 배포·운영하는 데 집중한다.

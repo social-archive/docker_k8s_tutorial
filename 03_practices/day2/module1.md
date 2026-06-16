@@ -7,7 +7,7 @@
 
 > 모든 명령은 Windows PowerShell 기준입니다.
 > 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
-> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
+> 실행 위치는 저장소 루트에서 `cd workspace`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 1-1. 클러스터 상태 점검
 
@@ -48,13 +48,13 @@ k9s
 
 ```powershell
 # namespace.yml 적용
-kubectl apply -f k8s/namespace.yml
+kubectl apply -f k8s-day2/namespace.yml
 
 # 생성 확인
 kubectl get namespaces
 ```
 
-**namespace.yml 내용 확인** (Antigravity IDE 또는 사용 중인 IDE에서 `day2/k8s/namespace.yml` 열기)
+**namespace.yml 내용 확인** (Antigravity IDE 또는 사용 중인 IDE에서 `day2/k8s-day2/namespace.yml` 열기)
 
 ```yaml
 apiVersion: v1

@@ -7,7 +7,7 @@
 
 > 모든 명령은 Windows PowerShell 기준입니다.
 > 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
-> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
+> 실행 위치는 저장소 루트에서 `cd workspace`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 3-1. 관련 파일 열기
 
@@ -49,7 +49,7 @@ Deployment가 Pod를 기동할 때 ConfigMap이 존재하지 않으면 `CreateCo
 > 지금은 "Deployment가 읽어야 할 설정 파일을 미리 만들어 두는 것"으로 이해하면 된다.
 
 ```powershell
-kubectl apply -f k8s/app-configmap.yml -n todo-app
+kubectl apply -f k8s-day2/app-configmap.yml -n todo-app
 
 # 생성 확인
 kubectl get configmap app-config -n todo-app
@@ -60,7 +60,7 @@ kubectl get configmap app-config -n todo-app
 ## 3-4. Spring 앱 Deployment 배포
 
 ```powershell
-kubectl apply -f k8s/app-deployment.yml -n todo-app
+kubectl apply -f k8s-day2/app-deployment.yml -n todo-app
 
 # Pod 기동 상태 확인
 kubectl get pods -n todo-app -w
@@ -103,7 +103,7 @@ Started TodoApplication in 3.x seconds
 ## 3-6. Service 생성 및 접근 확인
 
 ```powershell
-kubectl apply -f k8s/app-service.yml -n todo-app
+kubectl apply -f k8s-day2/app-service.yml -n todo-app
 
 # 서비스 확인
 kubectl get services -n todo-app

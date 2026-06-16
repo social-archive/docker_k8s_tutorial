@@ -692,7 +692,7 @@ kubectl get pvc postgres-pvc -n todo-app
 kubectl get deployment postgres -n todo-app
 ```
 
-> ⚠️ 만약 2일차 리소스가 없다면, `day2/k8s/` 리소스들을 먼저 적용하고 진행해야 배포 성공 시 앱이 정상 동작한다.
+> ⚠️ 만약 2일차 리소스가 없다면, `workspace/k8s-day2/` 리소스들을 먼저 적용하고 진행해야 배포 성공 시 앱이 정상 동작한다.
 
 #### 진행 순서
 

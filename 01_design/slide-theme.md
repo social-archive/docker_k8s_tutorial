@@ -45,8 +45,6 @@
 
 - **전체 분위기**: 기업용 기술 교육 자료, 클린 라이트 테마, 군더더기 없는 레이아웃
 - **색상**: GPT가 기업용 기술 프레젠테이션에 적합한 라이트 테마 컬러를 자율적으로 선택 (가능하면 라이트 테마 우선)
-- **폰트**: 한국어+영어 혼용에 적합한 산세리프 계열, 코드는 모노스페이스
-- **장식**: 불필요한 일러스트·배경 이미지 없음, 텍스트와 구조 중심
 
 ---
 
@@ -98,9 +96,6 @@ Tone & Voice:
 Design style:
 - Theme: corporate tech training, clean light mode (prefer light theme)
 - Choose a cohesive, professional light color palette suitable for B2B tech slides — white or off-white backgrounds, restrained use of color
-- Korean/English mixed font: clean sans-serif (e.g. Noto Sans KR or similar)
-- Code blocks: light background with subtle contrast, monospace font
-- No decorative illustrations or background images — structure and text first
 
 Per slide layout:
 - Layout type is chosen autonomously based on the content of each slide

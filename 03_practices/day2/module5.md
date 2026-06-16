@@ -8,7 +8,7 @@
 
 > 모든 명령은 Windows PowerShell 기준입니다.
 > 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
-> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
+> 실행 위치는 저장소 루트에서 `cd workspace`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 5-1. 전체 리소스 상태 한눈에 확인
 

@@ -1,7 +1,7 @@
 # 모듈 3 — 버전관리와 이미지 태그 반영
 
 > **목표**: GitHub Actions가 GHCR에 push한 이미지 태그를 확인하고
-> `day3/k8s/helm/values.yaml`의 `image.tag`에 수동으로 반영한다.
+> `day3/k8s-day3-gitops/helm/values.yaml`의 `image.tag`에 수동으로 반영한다.
 > Git commit 이력으로 "어떤 이미지 버전이 언제 배포됐는지" 추적하는 흐름을 체험하고,
 > 이미지 태그 전략과 배포 이력 관리 방식을 이해한다.
 
@@ -50,7 +50,7 @@ ghcr.io/<username>/todo-app:abc1234
 
 ## 3-3. values.yaml 이미지 태그 반영
 
-Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s/helm/values.yaml`을 연다.
+Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s-day3-gitops/helm/values.yaml`을 연다.
 
 **변경 전**
 
@@ -80,7 +80,7 @@ image:
 ## 3-4. 변경사항 commit / push
 
 ```powershell
-git add day3/k8s/helm/values.yaml
+git add day3/k8s-day3-gitops/helm/values.yaml
 git commit -m "deploy: update image tag to <7자리-short-sha>"
 git push origin main
 ```
@@ -91,10 +91,10 @@ git push origin main
 
 ```powershell
 # values.yaml에 대한 커밋 이력 확인
-git log --oneline day3/k8s/helm/values.yaml
+git log --oneline day3/k8s-day3-gitops/helm/values.yaml
 
 # 특정 커밋의 이미지 태그 확인
-git show HEAD:day3/k8s/helm/values.yaml | findstr tag
+git show HEAD:day3/k8s-day3-gitops/helm/values.yaml | findstr tag
 ```
 
 **출력 예시**
@@ -176,12 +176,12 @@ GitHub Actions가 이미지 빌드 후 `values.yaml`의 `image.tag`를
 - name: Update values.yaml image tag (advanced demo)
   run: |
     $sha = "${{ steps.sha.outputs.short }}"
-    (Get-Content day3/k8s/helm/values.yaml) `
+    (Get-Content day3/k8s-day3-gitops/helm/values.yaml) `
       -replace 'tag: ".*"', "tag: `"$sha`"" `
-      | Set-Content day3/k8s/helm/values.yaml
+      | Set-Content day3/k8s-day3-gitops/helm/values.yaml
     git config user.email "ci@github.com"
     git config user.name "GitHub Actions"
-    git add day3/k8s/helm/values.yaml
+    git add day3/k8s-day3-gitops/helm/values.yaml
     git commit -m "ci: update image tag to $sha"
     git push
 ```
@@ -191,9 +191,9 @@ GitHub Actions가 이미지 빌드 후 `values.yaml`의 `image.tag`를
 ## ✅ 모듈 3 완료 기준
 
 - [ ] GitHub Actions 또는 GHCR Packages에서 7자리 short SHA 이미지 태그를 확인했다
-- [ ] `day3/k8s/helm/values.yaml`의 `image.repository`와 `image.tag`를 수정했다
+- [ ] `day3/k8s-day3-gitops/helm/values.yaml`의 `image.repository`와 `image.tag`를 수정했다
 - [ ] 변경사항을 commit/push 했다
-- [ ] `git log --oneline day3/k8s/helm/values.yaml`로 배포 이력을 확인했다
+- [ ] `git log --oneline day3/k8s-day3-gitops/helm/values.yaml`로 배포 이력을 확인했다
 - [ ] `latest` 태그만 쓰면 안 되는 이유를 설명할 수 있다
 
 ---

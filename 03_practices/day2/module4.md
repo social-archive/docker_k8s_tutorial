@@ -8,7 +8,7 @@
 
 > 모든 명령은 Windows PowerShell 기준입니다.
 > 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
-> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
+> 실행 위치는 저장소 루트에서 `cd workspace`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 4-1. 관련 파일 열기
 
@@ -28,7 +28,7 @@ day2/k8s/
 ConfigMap은 **민감하지 않은 설정값**을 외부에서 주입하는 리소스다. module3에서 이미 적용했지만, 여기서는 내용을 다시 확인하고 재적용이 안전하게 동작하는지 확인한다.
 
 ```powershell
-kubectl apply -f k8s/app-configmap.yml -n todo-app
+kubectl apply -f k8s-day2/app-configmap.yml -n todo-app
 
 # 생성 확인
 kubectl get configmap -n todo-app
@@ -51,7 +51,7 @@ data:
 Secret은 **민감한 정보**를 Base64로 인코딩해 저장하는 리소스다. module2에서 이미 적용했지만, 여기서는 실제 리소스명과 키를 다시 확인한다.
 
 ```powershell
-kubectl apply -f k8s/app-secret.yml -n todo-app
+kubectl apply -f k8s-day2/app-secret.yml -n todo-app
 
 # 생성 확인
 kubectl get secret -n todo-app
@@ -87,7 +87,7 @@ env:
 설정 확인 후 Deployment를 재적용해도 같은 선언형 상태로 유지되는지 확인한다:
 
 ```powershell
-kubectl apply -f k8s/app-deployment.yml -n todo-app
+kubectl apply -f k8s-day2/app-deployment.yml -n todo-app
 
 # Pod 재기동 상태 확인
 kubectl rollout status deployment/todo-app -n todo-app

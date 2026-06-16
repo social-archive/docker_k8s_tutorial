@@ -8,7 +8,7 @@
 
 > 모든 명령은 Windows PowerShell 기준입니다.
 > 파일 편집은 Antigravity IDE를 권장하며, VS Code 또는 IntelliJ IDEA를 사용해도 됩니다.
-> 실행 위치는 저장소 루트에서 `cd day2`로 이동한 `day2/` 디렉터리 기준입니다.
+> 실행 위치는 저장소 루트에서 `cd workspace`로 이동한 `day2/` 디렉터리 기준입니다.
 
 ## 6-1. 대표적인 배포 오류 유형
 
@@ -79,7 +79,7 @@ configmaps "app-config" not found
 **[강사만 실행] 복구**
 
 ```powershell
-kubectl apply -f k8s/app-configmap.yml -n todo-app
+kubectl apply -f k8s-day2/app-configmap.yml -n todo-app
 kubectl rollout restart deployment/todo-app -n todo-app
 ```
 

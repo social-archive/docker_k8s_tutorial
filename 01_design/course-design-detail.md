@@ -1,7 +1,7 @@
 # DevOps를 위한 Docker & Kubernetes 실무 — 교안 상세기획안
 
 > 기업 내부 실무 워크숍을 위한 3일 과정 강의 설계 기준 문서.
-> 이 문서는 `README.md`, `day*_plan.md`, `day*/module*.md`, `preflight.md`, `troubleshooting.md`, `instructor-runbook.md`를 정리할 때 기준으로 사용한다.
+> 이 문서는 `README.md`, `01_design/day*_plan.md`, `03_practices/day*/module*.md`, `01_design/instructor-runbook.md`, `01_design/slide-theme.md` 등을 정리할 때 기준으로 사용한다.
 
 ---
 
@@ -420,8 +420,8 @@ CI/CD + GitOps + 롤백까지 성공.
 - 본인 fork 저장소
 - GitHub Actions 성공 이력
 - GHCR 이미지 생성 이력
-- `day3/k8s/app-deployment.yml` 이미지 태그 변경 commit
-- `day3/helm/todo-app` Helm chart/values 작성 commit
+- `workspace/k8s-day3-gitops/app-deployment.yml` 이미지 태그 변경 commit
+- `workspace/k8s-day3-gitops/helm/todo-app` Helm chart/values 작성 commit
 - 롤백 또는 revert commit
 
 ---
@@ -430,55 +430,21 @@ CI/CD + GitOps + 롤백까지 성공.
 
 최종 문서 구조는 다음 기준으로 정리한다.
 
-| 문서 | 역할 |
+| 디렉토리/문서 | 역할 |
 |---|---|
-| `README.md` | 과정 소개, 전체 흐름, 환경 요구사항, 최종 결과물 |
-| `day1_plan.md` | 1일차 강사용 기획/운영안 |
-| `day2_plan.md` | 2일차 강사용 기획/운영안 |
-| `day3_plan.md` | 3일차 강사용 기획/운영안 |
-| `day*/module*.md` | 수강생 실습지 |
-| `preflight.md` | 강의 전 사전 설치/점검 가이드 |
-| `troubleshooting.md` | 문제 해결 가이드 |
-| `instructor-runbook.md` | 강사용 진행표와 운영 대본 |
-| `course-design-detail.md` | 전체 강의 설계 기준 문서 |
+| `/README.md` | 과정 소개, 전체 흐름, 환경 요구사항, 최종 결과물 |
+| `/01_design/course-design-detail.md` | 전체 강의 설계 기준 문서 |
+| `/01_design/day*_plan.md` | 일차별 강사용 기획/운영안 |
+| `/01_design/instructor-runbook.md` | 강사용 진행표와 운영 대본 |
+| `/01_design/slide-theme.md` | GPT 강의 슬라이드 이미지 생성 디자인 가이드 |
+| `/02_lectures/day*/lecture*.md` | GPT 이미지 생성용 핵심 이론 슬라이드 내용 |
+| `/03_practices/day*/module*.md` | 수강생용 실습 가이드 |
 
 ---
 
-## 13. 추가 작성 예정 문서
+## 13. 추가 가이드 문서
 
-### 13.1 preflight.md
-
-강의 전 수강생에게 제공한다.
-
-포함 내용:
-
-- Docker Desktop 설치
-- WSL2 확인
-- Git 설치
-- Antigravity IDE 설치 권장
-- kubectl 확인
-- k9s 선택 설치
-- GitHub 계정 준비
-- 대표 저장소 fork 준비
-
-### 13.2 troubleshooting.md
-
-수강생과 강사용 문제 해결 문서.
-
-포함 내용:
-
-- Docker Desktop 실행 안 됨
-- WSL2 비활성화
-- 포트 충돌
-- docker build 실패
-- compose up 실패
-- ImagePullBackOff
-- CrashLoopBackOff
-- ConfigMap/Secret 누락
-- GHCR push/pull 문제
-- Argo CD OutOfSync/Degraded
-
-### 13.3 instructor-runbook.md
+### 13.1 instructor-runbook.md
 
 강사용 운영 문서.
 
@@ -490,6 +456,17 @@ CI/CD + GitOps + 롤백까지 성공.
 - 실패 시 우회 루트
 - 체크포인트
 - 시간이 부족할 때 생략 가능한 파트
+
+### 13.2 slide-theme.md
+
+GPT 이미지 생성 시 활용할 슬라이드 디자인 가이드.
+
+포함 내용:
+
+- 16:9 비율, 3x3 그리드 규격 (한 이미지당 9슬라이드)
+- 라이트 테마 기반의 구조적이고 정돈된 디자인
+- 과장된 마케팅 용어, 임의 통계 지어내기, 구조적 칩(Part 1 등), 요약/예고편 등 무의미한 슬라이드 생성 엄격히 금지
+- 거대한 슬라이드 번호 금지
 
 ---
 
@@ -507,8 +484,6 @@ CI/CD + GitOps + 롤백까지 성공.
 
 ### P1 — 운영 안정성 개선
 
-- [x] `preflight.md`를 추가한다.
-- [x] `troubleshooting.md`를 추가한다.
 - [x] `instructor-runbook.md`를 추가한다.
 - [x] 3일차 선행조건을 명시한다. day2 리소스가 적용되어 있어야 day3 GitOps 실습이 정상 진행된다.
 - [x] GitHub fork/GHCR 준비 절차를 명확히 작성한다.
@@ -528,7 +503,7 @@ CI/CD + GitOps + 롤백까지 성공.
 
 1. 이 문서를 기준으로 대표 설계 기준을 확정한다.
 2. `README.md`를 과정 소개 문서로 재정리한다.
-3. `day*_plan.md`를 강사용 기획안으로 재정리한다.
-4. `day*/module*.md`를 수강생 실습지로 정리한다.
-5. `preflight.md`, `troubleshooting.md`, `instructor-runbook.md`를 추가한다.
+3. `01_design/day*_plan.md`를 강사용 기획안으로 재정리한다.
+4. `03_practices/day*/module*.md`를 수강생 실습지로 정리한다.
+5. `01_design/instructor-runbook.md` 및 `01_design/slide-theme.md`를 보완한다.
 6. 실제 명령 dry-run으로 Docker/Compose/Kubernetes/GitOps 흐름을 검증한다.

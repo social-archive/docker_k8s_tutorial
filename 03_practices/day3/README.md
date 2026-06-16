@@ -31,7 +31,7 @@ GitHub Actions CI
   수강생이 values.yaml의 image.tag 수동 변경
             │
             ▼
-  Git push (day3/k8s/helm)
+  Git push (workspace/k8s-day3-gitops/helm)
             │
             ▼
   Argo CD OutOfSync 감지
@@ -48,14 +48,14 @@ GitHub Actions CI
 ## 실습 파일 구조
 
 ```text
-day3/
-├── k8s/
-│   ├── app-deployment.yml      ← raw manifest (이미지 태그 수동 변경 대상)
-│   └── helm/
-│       ├── Chart.yaml          ← Helm chart 메타데이터
-│       ├── values.yaml         ← 이미지 태그/replica/resources 변경 지점
-│       └── templates/
-│           └── deployment.yaml ← Deployment 템플릿
+workspace/
+└── k8s-day3-gitops/
+    ├── app-deployment.yml      ← raw manifest (이미지 태그 수동 변경 대상)
+    └── helm/
+        ├── Chart.yaml          ← Helm chart 메타데이터
+        ├── values.yaml         ← 이미지 태그/replica/resources 변경 지점
+        └── templates/
+            └── deployment.yaml ← Deployment 템플릿
 ```
 
 > 3일차 Helm chart는 앱 Deployment만 관리한다.

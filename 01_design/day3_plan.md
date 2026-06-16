@@ -56,7 +56,7 @@ Git의 manifest 또는 Helm values 변경이 Argo CD를 거쳐 로컬 Kubernetes
 
 ### 실습 2. 버전 태깅과 배포 기준 정리
 - 목표: GHCR 이미지 태그를 확인하고 배포 매니페스트에 수동 반영한다.
-- 체크포인트: 이미지 태그 확인, `day3/k8s/app-deployment.yml` 수정, commit/push, 배포 이력 추적 가능.
+- 체크포인트: 이미지 태그 확인, `workspace/k8s-day3-gitops/app-deployment.yml` 수정, commit/push, 배포 이력 추적 가능.
 - 성공 조건: 어떤 이미지 태그가 어떤 Git commit으로 배포됐는지 역추적할 수 있다.
 
 ### 실습 3. Helm chart 작성

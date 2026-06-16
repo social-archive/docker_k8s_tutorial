@@ -298,7 +298,7 @@ Kubernetes 활성화 준비          → 3일차 배포 소스 확보           
 ### GitOps 전체 흐름
 
 > 3일차 Argo CD 실습은 2일차에서 만든 `todo-app` 네임스페이스와 `Service`, `ConfigMap`, `Secret`, PostgreSQL 리소스가 클러스터에 남아 있다는 전제로 진행한다.
-> 3일차는 `day3/k8s`의 애플리케이션 Deployment로 GitOps 흐름을 먼저 잡은 뒤, Helm을 별도 학습 주제로 다룬다.
+> 3일차는 `workspace/k8s-day3-gitops`의 애플리케이션 Deployment로 GitOps 흐름을 먼저 잡은 뒤, Helm을 별도 학습 주제로 다룬다.
 > Helm 파트에서는 같은 앱 배포를 `Chart.yaml`, `values.yaml`, `templates/` 구조로 재구성하고, 이미지 태그 변경 지점을 values로 분리하는 방식을 학습한다.
 > 2일차 기반 리소스(`todo-app` Service, `postgres` Service/Deployment/PVC, `app-config`, `db-secret`)는 다시 생성하지 않는다.
 
@@ -315,7 +315,7 @@ GitHub Actions (CI)
   수강생이 GHCR 이미지 태그 확인
                 │
                 ▼
-  day3/k8s/app-deployment.yml 이미지 태그 수동 변경
+  workspace/k8s-day3-gitops/app-deployment.yml 이미지 태그 수동 변경
                 │
                 ▼
   Helm chart/values로 같은 변경 지점 구조화
@@ -339,7 +339,7 @@ GitHub Actions (CI)
 |---|---|---|
 | **모듈 1** CI/CD 구조와 GitOps 이해 | 09:00~10:00 | 개발·검증·운영 환경 간 변경 관리 흐름과 GitOps의 핵심 개념을 도식으로 정리한다. |
 | **모듈 2** GitHub Actions CI 구성 | 10:00~11:20 | Spring Boot 코드가 push되었을 때 GitHub Actions가 빌드·테스트를 수행하고 GHCR에 이미지를 push하는 workflow를 작성한다. |
-| **모듈 3** 버전관리와 이미지 태깅 | 11:20~12:30 | GHCR 이미지 태그를 확인하고 `day3/k8s/app-deployment.yml`에 반영해 Git 기반 배포 이력을 만든다. |
+| **모듈 3** 버전관리와 이미지 태깅 | 11:20~12:30 | GHCR 이미지 태그를 확인하고 `workspace/k8s-day3-gitops/app-deployment.yml`에 반영해 Git 기반 배포 이력을 만든다. |
 | **모듈 4** Helm 기본과 차트 구조 | 13:30~14:40 | Helm을 별도 학습 주제로 다룬다. `Chart.yaml`, `values.yaml`, `templates/` 구조를 만들고 이미지 태그를 values로 분리한다. |
 | **모듈 5** Argo CD 설치 및 앱 등록 | 14:40~16:00 | 로컬 Kubernetes에 Argo CD를 설치하고, plain manifest 경로와 Helm chart 경로를 Application source로 등록하는 차이를 학습한다. |
 | **모듈 6** Sync, 롤백, 운영 체크리스트 | 16:00~18:00 | 수동 Sync, OutOfSync/Healthy 확인, 잘못된 이미지 태그 장애 재현, Git revert 또는 Argo CD rollback 복구를 실습한다. |
@@ -349,7 +349,7 @@ GitHub Actions (CI)
 | 실습 | 목표 | 체크포인트 | 성공 조건 |
 |---|---|---|---|
 | **실습 1** GitHub Actions CI 파이프라인 구성 | 코드 변경 시 테스트와 빌드가 자동 실행되도록 workflow 작성 | push 또는 PR 발생 시 job이 실행되고, 테스트와 빌드가 성공 | Docker 이미지가 생성되며 레지스트리(GHCR) 반영 완료 |
-| **실습 2** 이미지 태그 수동 반영 | GHCR 이미지 태그를 확인하고 기본 매니페스트에 직접 반영 | 이미지 태그 확인, `day3/k8s/app-deployment.yml` 수정, commit/push | 어떤 이미지 태그가 어떤 Git commit으로 배포됐는지 역추적할 수 있다 |
+| **실습 2** 이미지 태그 수동 반영 | GHCR 이미지 태그를 확인하고 기본 매니페스트에 직접 반영 | 이미지 태그 확인, `workspace/k8s-day3-gitops/app-deployment.yml` 수정, commit/push | 어떤 이미지 태그가 어떤 Git commit으로 배포됐는지 역추적할 수 있다 |
 | **실습 3** Helm 차트 작성 | 앱 Deployment를 Helm chart로 패키징하고 values로 변경점을 분리 | `Chart.yaml`, `values.yaml`, `templates/deployment.yaml`, `helm template` 결과 확인 | raw manifest와 Helm values 방식의 차이를 설명할 수 있다 |
 | **실습 4** Argo CD 설치와 애플리케이션 등록 | 로컬 Kubernetes에 Argo CD를 설치하고 plain manifest/Helm chart 앱 등록 | Argo CD UI/CLI 접근, 앱 등록, Sync 상태 확인 | Git 저장소의 manifest 또는 Helm chart가 클러스터 대상 앱으로 연결된다 |
 | **실습 5** 롤백 및 복구 | 잘못된 버전이나 설정을 되돌리고 서비스 정상 상태 복구 | 이전 revision 선택, rollback 또는 재동기화 수행, 정상 상태 확인 | 이전 정상 버전으로 서비스가 복구된다 |
@@ -385,12 +385,12 @@ argocd login localhost:8443 --insecure
 
 argocd app create todo-app `
   --repo https://github.com/[계정명]/docker_k8s_tutorial.git `
-  --path day3/k8s/helm `
+  --path workspace/k8s-day3-gitops/helm `
   --dest-server https://kubernetes.default.svc `
   --dest-namespace todo-app
 ```
 
-> Argo CD가 `day3/k8s/helm` 경로에서 `Chart.yaml`을 감지하면 자동으로 Helm source로 인식한다.
+> Argo CD가 `workspace/k8s-day3-gitops/helm` 경로에서 `Chart.yaml`을 감지하면 자동으로 Helm source로 인식한다.
 > 이미지 태그 변경은 `values.yaml`의 `image.tag`에서 수행한다.
 
 ### Argo CD 동기화 상태 설명
@@ -461,51 +461,51 @@ argocd app create todo-app `
 
 ## 9. 프로젝트 파일 구조
 
-```
+```text
 docker_k8s_tutorial/
 │
 ├── README.md                          ← 이 강의기획서
 │
-├── spring-app/                        ← 공통 실습 앱 소스
-│   ├── Dockerfile                     ← 멀티스테이지 빌드 (Java 불필요)
-│   ├── build.gradle
-│   ├── settings.gradle
-│   └── src/main/java/com/tutorial/app/
-│       ├── TodoApplication.java
-│       ├── controller/TodoController.java
-│       ├── service/TodoService.java
-│       └── domain/
-│           ├── Todo.java
-│           └── TodoRepository.java
+├── 01_design/                         ← 과정 기획 및 설계 가이드
+│   ├── course-design-detail.md
+│   ├── instructor-runbook.md
+│   └── slide-theme.md
 │
-├── day1/                              ← 1일차 실습 파일
-│   ├── README.md                      ← 실습 가이드 (단계별 명령 포함)
-│   ├── compose.yml                    ← Spring + PostgreSQL Compose
-│   └── .env                           ← 환경변수 분리 예제
+├── 02_lectures/                       ← 이론 강의 슬라이드
+│   ├── day1/
+│   ├── day2/
+│   └── day3/
 │
-├── day2/                              ← 2일차 실습 파일
-│   ├── README.md                      ← 실습 가이드 (kubectl 명령 포함)
-│   └── k8s/
-│       ├── namespace.yml
-│       ├── postgres-pvc.yml
-│       ├── postgres-deployment.yml
-│       ├── postgres-service.yml
-│       ├── app-configmap.yml          ← DB 호스트/포트/이름
-│       ├── app-secret.yml             ← DB 계정/비밀번호 (base64)
-│       ├── app-deployment.yml
-│       └── app-service.yml            ← NodePort (localhost:30080)
-│
-├── day3/                              ← 3일차 실습 파일
-│   ├── README.md                      ← 실습 가이드 (GitOps + Helm 흐름 포함)
-│   └── k8s/
-│       ├── app-deployment.yml         ← raw manifest (이미지 태그 수동 변경 대상)
-│       └── helm/
-│           ├── Chart.yaml             ← Helm chart 메타데이터
-│           ├── values.yaml            ← 이미지 태그/replicas/resources 변경 지점
-│           └── templates/
-│               └── deployment.yaml    ← Deployment 템플릿
-│
-│   ※ day3/k8s/helm 은 app Deployment만 포함한다. Service/ConfigMap/Secret/PostgreSQL은 day2 실습 결과를 전제로 한다.
+├── 03_practices/                      ← 실습 자료 모음
+│   ├── day1/                          ← 1일차 가이드 문서
+│   ├── day2/                          ← 2일차 가이드 문서
+│   ├── day3/                          ← 3일차 가이드 문서
+│   │
+│   └── workspace/                     ← 통합 실습 작업 공간
+│       ├── spring-app/                ← 공통 실습 앱 소스
+│       │   ├── Dockerfile
+│       │   ├── build.gradle
+│       │   └── src/main/java/com/tutorial/app/
+│       │
+│       ├── compose.yml                ← Spring + PostgreSQL Compose
+│       ├── .env                       ← 환경변수 분리 예제
+│       │
+│       ├── k8s-day2/                  ← 2일차 Kubernetes 매니페스트
+│       │   ├── namespace.yml
+│       │   ├── postgres-pvc.yml
+│       │   ├── postgres-deployment.yml
+│       │   ├── postgres-service.yml
+│       │   ├── app-configmap.yml      ← DB 호스트/포트/이름
+│       │   ├── app-secret.yml         ← DB 계정/비밀번호 (base64)
+│       │   ├── app-deployment.yml
+│       │   └── app-service.yml        ← NodePort (localhost:30080)
+│       │
+│       └── k8s-day3-gitops/           ← 3일차 GitOps 매니페스트 및 Helm
+│           ├── app-deployment.yml     ← raw manifest (수동 변경 대상)
+│           └── helm/                  ← Helm chart
+│               ├── Chart.yaml
+│               ├── values.yaml
+│               └── templates/
 │
 └── .github/
     └── workflows/

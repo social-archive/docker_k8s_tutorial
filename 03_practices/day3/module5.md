@@ -1,7 +1,7 @@
 # 모듈 5 — Argo CD 설치 및 앱 등록
 
 > **목표**: 로컬 Kubernetes 환경에 Argo CD를 구축하고
-> `day3/k8s/helm`을 Argo CD Application으로 등록해
+> `day3/k8s-day3-gitops/helm`을 Argo CD Application으로 등록해
 > Git의 `values.yaml` 변경이 클러스터에 자동 반영되는 GitOps 기반을 만든다.
 
 ---
@@ -25,12 +25,12 @@ kubectl get deployment postgres -n todo-app
 | 리소스 | 2일차 생성 파일 | 3일차에서 필요한 이유 |
 |---|---|---|
 | `todo-app` Namespace | `day2/k8s/namespace.yml` | Argo CD 배포 대상 namespace |
-| `todo-app` Service | `day2/k8s/app-service.yml` | `localhost:30080` API 확인 |
+| `todo-app` Service | `day2/k8s-day3-gitops/app-service.yml` | `localhost:30080` API 확인 |
 | `postgres` Service/Deployment/PVC | `day2/k8s/postgres-*.yml` | Spring 앱 DB 연결 |
-| `app-config` ConfigMap | `day2/k8s/app-configmap.yml` | `DB_HOST`, `DB_PORT`, `DB_NAME` 주입 |
-| `db-secret` Secret | `day2/k8s/app-secret.yml` | DB 계정/비밀번호 주입 |
+| `app-config` ConfigMap | `day2/k8s-day3-gitops/app-configmap.yml` | `DB_HOST`, `DB_PORT`, `DB_NAME` 주입 |
+| `db-secret` Secret | `day2/k8s-day3-gitops/app-secret.yml` | DB 계정/비밀번호 주입 |
 
-> ⚠️ `day3/k8s/helm`은 앱 Deployment 하나만 관리한다.
+> ⚠️ `day3/k8s-day3-gitops/helm`은 앱 Deployment 하나만 관리한다.
 > 위 기반 리소스가 없으면 Argo CD Sync는 되더라도 앱 Pod가
 > `CreateContainerConfigError`, `CrashLoopBackOff`, DB 연결 실패 상태가 될 수 있다.
 > 없으면 `day2/k8s/` 매니페스트를 먼저 적용한 뒤 진행한다.
@@ -103,7 +103,7 @@ argocd login localhost:8443 --username admin --password <위의 비밀번호> --
 
 ## 5-6. Application 등록 — Helm chart 방식
 
-`day3/k8s/helm`을 source로 등록한다.
+`day3/k8s-day3-gitops/helm`을 source로 등록한다.
 Argo CD가 `Chart.yaml`을 감지하면 자동으로 Helm source로 인식하고
 `values.yaml`을 반영해 렌더링된 Kubernetes 리소스를 클러스터에 배포한다.
 
@@ -119,7 +119,7 @@ Argo CD가 `Chart.yaml`을 감지하면 자동으로 Helm source로 인식하고
 | Project | `default` |
 | Repository URL | 본인의 GitHub 저장소 URL |
 | Revision | `HEAD` |
-| Path | `day3/k8s/helm` |
+| Path | `day3/k8s-day3-gitops/helm` |
 | Cluster URL | `https://kubernetes.default.svc` |
 | Namespace | `todo-app` |
 
@@ -130,12 +130,12 @@ Argo CD가 `Chart.yaml`을 감지하면 자동으로 Helm source로 인식하고
 ```powershell
 argocd app create todo-app `
   --repo https://github.com/<username>/docker_k8s_tutorial.git `
-  --path day3/k8s/helm `
+  --path day3/k8s-day3-gitops/helm `
   --dest-server https://kubernetes.default.svc `
   --dest-namespace todo-app
 ```
 
-> 💡 Argo CD가 `day3/k8s/helm`에서 `Chart.yaml`을 찾으면
+> 💡 Argo CD가 `day3/k8s-day3-gitops/helm`에서 `Chart.yaml`을 찾으면
 > 자동으로 Helm source로 전환한다. 별도 설정 없이도 동작한다.
 
 ---
@@ -181,7 +181,7 @@ curl.exe http://localhost:30080/todos
 
 ## 5-9. Argo CD가 Helm을 처리하는 방식
 
-Argo CD는 `day3/k8s/helm` 경로에서 `Chart.yaml`을 감지하면
+Argo CD는 `day3/k8s-day3-gitops/helm` 경로에서 `Chart.yaml`을 감지하면
 내부적으로 `helm template`을 실행해 Kubernetes 리소스를 생성한다.
 
 ```
@@ -207,7 +207,7 @@ Argo CD가 감지 → Helm 렌더링 → 클러스터 반영 순서로 처리된
 - [ ] Argo CD가 `argocd` 네임스페이스에 설치되었다
 - [ ] `https://localhost:8443`으로 UI에 접근 가능하다
 - [ ] 2일차 기반 리소스(`todo-app` Service, `postgres`, `app-config`, `db-secret`)가 확인되었다
-- [ ] `todo-app` Application이 `day3/k8s/helm` Helm source로 Argo CD에 등록되었다
+- [ ] `todo-app` Application이 `day3/k8s-day3-gitops/helm` Helm source로 Argo CD에 등록되었다
 - [ ] 수동 Sync 후 Pod가 Running 상태이고 `http://localhost:30080/todos`가 정상 응답한다
 - [ ] Argo CD가 `values.yaml`을 렌더링해 클러스터에 반영하는 흐름을 설명할 수 있다
 

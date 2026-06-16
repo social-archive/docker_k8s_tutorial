@@ -12,7 +12,7 @@
 
 ## 4-1. Helm이 필요한 이유
 
-지금까지 `day3/k8s/app-deployment.yml`에서 이미지 태그를 직접 수정했다.
+지금까지 `day3/k8s-day3-gitops/app-deployment.yml`에서 이미지 태그를 직접 수정했다.
 이 방식은 간단하지만, 환경이 여러 개이거나 변경점을 추적할 기준이 모호하다.
 
 | 방식 | 특징 | 단점 |
@@ -47,10 +47,10 @@ helm version
 
 ## 4-3. Helm chart 구조 확인
 
-Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s/helm/` 디렉토리를 확인한다.
+Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s-day3-gitops/helm/` 디렉토리를 확인한다.
 
 ```
-day3/k8s/helm/
+day3/k8s-day3-gitops/helm/
 ├── Chart.yaml               ← chart 이름, 버전 정보
 ├── values.yaml              ← 변경 가능한 기본값 모음
 └── templates/
@@ -61,7 +61,7 @@ day3/k8s/helm/
 
 ## 4-4. Chart.yaml 확인
 
-`day3/k8s/helm/Chart.yaml` 내용:
+`day3/k8s-day3-gitops/helm/Chart.yaml` 내용:
 
 ```yaml
 apiVersion: v2
@@ -82,7 +82,7 @@ appVersion: "1.0"
 
 ## 4-5. values.yaml 확인
 
-`day3/k8s/helm/values.yaml` 내용:
+`day3/k8s-day3-gitops/helm/values.yaml` 내용:
 
 ```yaml
 image:
@@ -111,7 +111,7 @@ secretName: db-secret
 
 ## 4-6. values.yaml — 이미지 태그 반영
 
-Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s/helm/values.yaml`을 열어
+Antigravity IDE 또는 사용 중인 IDE에서 `day3/k8s-day3-gitops/helm/values.yaml`을 열어
 모듈 3에서 확인한 7자리 short SHA 태그와 본인 GitHub 계정명으로 수정한다.
 
 ```yaml
@@ -127,7 +127,7 @@ image:
 
 ## 4-7. templates/deployment.yaml 확인
 
-`day3/k8s/helm/templates/deployment.yaml` 핵심 부분:
+`day3/k8s-day3-gitops/helm/templates/deployment.yaml` 핵심 부분:
 
 ```yaml
 spec:
@@ -163,7 +163,7 @@ values를 반영한 최종 Kubernetes YAML만 출력한다.
 
 ```powershell
 # 저장소 루트에서 실행
-helm template todo-app day3/k8s/helm
+helm template todo-app day3/k8s-day3-gitops/helm
 ```
 
 **출력 예시**
@@ -188,10 +188,10 @@ spec:
 이미지 태그만 빠르게 확인하려면:
 
 ```powershell
-helm template todo-app day3/k8s/helm | findstr image:
+helm template todo-app day3/k8s-day3-gitops/helm | findstr image:
 ```
 
-> 💡 출력된 YAML이 `day3/k8s/app-deployment.yml`과 구조적으로 동일하다.
+> 💡 출력된 YAML이 `day3/k8s-day3-gitops/app-deployment.yml`과 구조적으로 동일하다.
 > 차이는 수정 위치다. raw manifest는 `image:` 줄을 직접 찾지만,
 > Helm은 `values.yaml`의 `image.tag` 한 줄만 바꾸면 된다.
 
@@ -199,7 +199,7 @@ helm template todo-app day3/k8s/helm | findstr image:
 
 ## 4-9. raw manifest vs Helm 비교
 
-| 항목 | raw manifest (`day3/k8s/`) | Helm chart (`day3/k8s/helm/`) |
+| 항목 | raw manifest (`day3/k8s/`) | Helm chart (`day3/k8s-day3-gitops/helm/`) |
 |---|---|---|
 | 이미지 태그 변경 위치 | `app-deployment.yml` 직접 수정 | `values.yaml`의 `image.tag` 수정 |
 | replicas 변경 위치 | `app-deployment.yml` 직접 수정 | `values.yaml`의 `replicaCount` 수정 |
@@ -213,7 +213,7 @@ helm template todo-app day3/k8s/helm | findstr image:
 values.yaml을 수정했으면 commit/push해서 Git 이력을 남긴다.
 
 ```powershell
-git add day3/k8s/helm/values.yaml
+git add day3/k8s-day3-gitops/helm/values.yaml
 git commit -m "helm: update image tag in values"
 git push origin main
 ```
@@ -223,9 +223,9 @@ git push origin main
 ## ✅ 모듈 4 완료 기준
 
 - [ ] `helm version` 명령이 정상 출력된다
-- [ ] `day3/k8s/helm/` 구조(`Chart.yaml`, `values.yaml`, `templates/`)를 설명할 수 있다
+- [ ] `day3/k8s-day3-gitops/helm/` 구조(`Chart.yaml`, `values.yaml`, `templates/`)를 설명할 수 있다
 - [ ] `values.yaml`의 `image.repository`와 `image.tag`를 본인 정보로 수정했다
-- [ ] `helm template todo-app day3/k8s/helm` 결과에서 수정한 이미지 태그가 보인다
+- [ ] `helm template todo-app day3/k8s-day3-gitops/helm` 결과에서 수정한 이미지 태그가 보인다
 - [ ] raw manifest 수정 방식과 Helm values 수정 방식의 차이를 설명할 수 있다
 
 ---
